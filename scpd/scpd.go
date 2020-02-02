@@ -64,8 +64,11 @@ type SpecVersion struct {
 	Minor int32 `xml:"minor"`
 }
 
+// Action defines a single service function
 type Action struct {
-	Name      string     `xml:"name"`
+	// Name names the actiobn (function)
+	Name string `xml:"name"`
+	// Arguments lists action's arguments
 	Arguments []Argument `xml:"argumentList>argument"`
 }
 
@@ -98,11 +101,20 @@ func (action *Action) OutputArguments() []*Argument {
 	return result
 }
 
+// Argument describes an action's argument.
+//
+// See http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v2.0.pdf
+// section 2.5 "Service description"
 type Argument struct {
-	Name                 string `xml:"name"`
-	Direction            string `xml:"direction"`            // in|out
-	RelatedStateVariable string `xml:"relatedStateVariable"` // ?
-	Retval               string `xml:"retval"`               // ?
+	// Name names the argument
+	Name string `xml:"name"`
+	// Direction defines the direction of the argument (in|out)
+	Direction string `xml:"direction"`
+	// RelatedStateVariable refers to an entry from the state service table.
+	RelatedStateVariable string `xml:"relatedStateVariable"`
+	// The first argument of the action's argument list
+	// is allowed to be marked as a return value.
+	Retval string `xml:"retval"`
 }
 
 func (arg *Argument) clean() {

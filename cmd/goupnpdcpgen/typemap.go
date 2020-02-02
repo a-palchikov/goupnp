@@ -1,35 +1,30 @@
 package main
 
-type conv struct {
-	FuncSuffix string
-	ExtType    string
-}
-
 // typeConvs maps from a SOAP type (e.g "fixed.14.4") to the function name
 // suffix inside the soap module (e.g "Fixed14_4") and the Go type.
-var typeConvs = map[string]conv{
-	"ui1":         {"Ui1", "uint8"},
-	"ui2":         {"Ui2", "uint16"},
-	"ui4":         {"Ui4", "uint32"},
-	"ui8":         {"Ui8", "uint64"},
-	"i1":          {"I1", "int8"},
-	"i2":          {"I2", "int16"},
-	"i4":          {"I4", "int32"},
-	"int":         {"Int", "int64"},
-	"r4":          {"R4", "float32"},
-	"r8":          {"R8", "float64"},
-	"number":      {"R8", "float64"}, // Alias for r8.
-	"fixed.14.4":  {"Fixed14_4", "float64"},
-	"float":       {"R8", "float64"},
-	"char":        {"Char", "rune"},
-	"string":      {"String", "string"},
-	"date":        {"Date", "time.Time"},
-	"dateTime":    {"DateTime", "time.Time"},
-	"dateTime.tz": {"DateTimeTz", "time.Time"},
-	"time":        {"TimeOfDay", "soap.TimeOfDay"},
-	"time.tz":     {"TimeOfDayTz", "soap.TimeOfDay"},
-	"boolean":     {"Boolean", "bool"},
-	"bin.base64":  {"BinBase64", "[]byte"},
-	"bin.hex":     {"BinHex", "[]byte"},
-	"uri":         {"URI", "*url.URL"},
+var typeConvs = map[string]string{
+	"ui1":         "soap.Ui1",
+	"ui2":         "soap.Ui2",
+	"ui4":         "soap.Ui4",
+	"ui8":         "soap.Ui8",
+	"i1":          "soap.I1",
+	"i2":          "soap.I2",
+	"i4":          "soap.I4",
+	"int":         "soap.Int",
+	"r4":          "soap.R4",
+	"r8":          "soap.R8",
+	"number":      "soap.R8",
+	"fixed.14.4":  "soap.Fixed14_4",
+	"float":       "soap.R8",
+	"char":        "soap.Char",
+	"string":      "soap.String",
+	"date":        "soap.Date",
+	"dateTime":    "soap.DateTime",
+	"dateTime.tz": "soap.DateTimeTz",
+	"time":        "soap.TimeOfDay",
+	"time.tz":     "soap.TimeOfDayTz",
+	"boolean":     "soap.Bool",
+	"bin.base64":  "soap.BinBase64",
+	"bin.hex":     "soap.BinHex",
+	"uri":         "soap.URI",
 }

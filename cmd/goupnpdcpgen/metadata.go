@@ -44,6 +44,11 @@ var dcpMetadata = []DCPMetadata{
 		DocURL:       "http://upnp.org/specs/av/av1/",
 		XMLSpecURL:   "http://upnp.org/specs/av/UPnP-av-TestFiles-20070927.zip",
 	},
+	{
+		Name:         "wiimu",
+		OfficialName: "Wiimu Link Player",
+		XMLSpecURL:   "file:///home/deemok/dev/bazalka/drumz/spec/wiimu.zip",
+	},
 }
 
 func totalBytesHack(dcp *DCP) error {

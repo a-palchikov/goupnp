@@ -169,7 +169,7 @@ func (v DateTest) Equal(result interface{}) bool {
 }
 func (v DateTest) Dupe(tag string) []convTest {
 	if tag != "no:dateTime" {
-		return []convTest{DateTimeTest{v.Time}}
+		return []convTest{DateTimeTest(v)}
 	}
 	return nil
 }
@@ -189,7 +189,7 @@ func (v TimeOfDayTest) Equal(result interface{}) bool {
 }
 func (v TimeOfDayTest) Dupe(tag string) []convTest {
 	if tag != "no:time.tz" {
-		return []convTest{TimeOfDayTzTest{v.TimeOfDay}}
+		return []convTest{TimeOfDayTzTest(v)}
 	}
 	return nil
 }
@@ -221,7 +221,7 @@ func (v DateTimeTest) Equal(result interface{}) bool {
 }
 func (v DateTimeTest) Dupe(tag string) []convTest {
 	if tag != "no:dateTime.tz" {
-		return []convTest{DateTimeTzTest{v.Time}}
+		return []convTest{DateTimeTzTest(v)}
 	}
 	return nil
 }

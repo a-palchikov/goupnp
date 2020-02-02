@@ -3,15 +3,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-)
+	"regexp"
 
-var (
-	deviceURNPrefix  = "urn:schemas-upnp-org:device:"
-	serviceURNPrefix = "urn:schemas-upnp-org:service:"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -32,7 +29,7 @@ func main() {
 
 func run(dcpName, specsDir string, useGofmt bool) error {
 	if err := os.MkdirAll(specsDir, os.ModePerm); err != nil {
-		return fmt.Errorf("could not create specs-dir %q: %v\n", specsDir, err)
+		return errors.Wrapf(err, "could not create specs-dir %q: %v\n", specsDir)
 	}
 
 	for _, d := range dcpMetadata {
@@ -42,23 +39,28 @@ func run(dcpName, specsDir string, useGofmt bool) error {
 		specFilename := filepath.Join(specsDir, d.Name+".zip")
 		err := acquireFile(specFilename, d.XMLSpecURL)
 		if err != nil {
-			return fmt.Errorf("could not acquire spec for %s: %v", d.Name, err)
+			return errors.Wrapf(err, "could not acquire spec for %s", d.Name)
 		}
 		dcp := newDCP(d)
 		if err := dcp.processZipFile(specFilename); err != nil {
-			return fmt.Errorf("error processing spec for %s in file %q: %v", d.Name, specFilename, err)
+			return errors.Wrapf(err, "error processing spec for %s in file %q", d.Name, specFilename)
 		}
 		for i, hack := range d.Hacks {
 			if err := hack(dcp); err != nil {
-				return fmt.Errorf("error with Hack[%d] for %s: %v", i, d.Name, err)
+				return errors.Wrapf(err, "error with Hack[%d] for %s", i, d.Name)
 			}
 		}
 		if err := dcp.writeCode(d.Name+".go", useGofmt); err != nil {
-			return fmt.Errorf("error writing package %q: %v", dcp.Metadata.Name, err)
+			return errors.Wrapf(err, "error writing package %q", dcp.Metadata.Name)
 		}
 
 		return nil
 	}
 
-	return fmt.Errorf("could not find DCP with name %q", dcpName)
+	return errors.Errorf("could not find DCP with name %q", dcpName)
 }
+
+var (
+	deviceURNPrefix  = regexp.MustCompile(`^urn\:schemas\-[a-z]+(\-[a-z]+)*\:device\:`)
+	serviceURNPrefix = regexp.MustCompile(`^urn\:schemas\-[a-z]+(\-[a-z]+)*\:service\:`)
+)

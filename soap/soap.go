@@ -8,9 +8,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"reflect"
 	"regexp"
+	"strings"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -30,16 +35,16 @@ func NewSOAPClient(endpointURL url.URL) *SOAPClient {
 	}
 }
 
-// PerformSOAPAction makes a SOAP request, with the given action.
+// PerformAction makes a SOAP request, with the given action.
 // inAction and outAction must both be pointers to structs with string fields
 // only.
-func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAction interface{}, outAction interface{}) error {
+func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAction, outAction interface{}) error {
 	requestBytes, err := encodeRequestAction(actionNamespace, actionName, inAction)
 	if err != nil {
 		return err
 	}
 
-	response, err := client.HTTPClient.Do(&http.Request{
+	request := &http.Request{
 		Method: "POST",
 		URL:    &client.EndpointURL,
 		Header: http.Header{
@@ -49,20 +54,33 @@ func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAc
 		Body: ioutil.NopCloser(bytes.NewBuffer(requestBytes)),
 		// Set ContentLength to avoid chunked encoding - some servers might not support it.
 		ContentLength: int64(len(requestBytes)),
-	})
+	}
+	requestDumpBytes, err := httputil.DumpRequest(request, true)
 	if err != nil {
-		return fmt.Errorf("goupnp: error performing SOAP HTTP request: %v", err)
+		return err
+	}
+	log.WithField("req", string(requestDumpBytes)).Info("Encode request.")
+	response, err := client.HTTPClient.Do(request)
+	if err != nil {
+		return errors.Wrapf(err, "goupnp: error performing SOAP HTTP request")
 	}
 	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		return fmt.Errorf("goupnp: SOAP request got HTTP %s", response.Status)
+		responseBytes, err := ioutil.ReadAll(response.Body)
+		log.WithFields(log.Fields{
+			log.ErrorKey: err,
+			"resp":       string(responseBytes),
+		}).Warn("Response with error.")
+		return errors.Errorf("goupnp: SOAP request got HTTP %s", response.Status)
 	}
 
 	responseEnv := newSOAPEnvelope()
 	decoder := xml.NewDecoder(response.Body)
 	if err := decoder.Decode(responseEnv); err != nil {
-		return fmt.Errorf("goupnp: error decoding response body: %v", err)
+		return errors.Wrapf(err, "goupnp: error decoding response body: %v")
 	}
+
+	log.WithField("resp", responseEnv).Info("Recv response.")
 
 	if responseEnv.Body.Fault != nil {
 		return responseEnv.Body.Fault
@@ -70,7 +88,7 @@ func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAc
 
 	if outAction != nil {
 		if err := xml.Unmarshal(responseEnv.Body.RawAction, outAction); err != nil {
-			return fmt.Errorf("goupnp: error unmarshalling out action: %v, %v", err, responseEnv.Body.RawAction)
+			return errors.Wrapf(err, "goupnp: error unmarshalling out action: %v", responseEnv.Body.RawAction)
 		}
 	}
 
@@ -93,16 +111,19 @@ func encodeRequestAction(actionNamespace, actionName string, inAction interface{
 	requestBuf := new(bytes.Buffer)
 	requestBuf.WriteString(soapPrefix)
 	requestBuf.WriteString(`<u:`)
+	//nolint:errcheck
 	xml.EscapeText(requestBuf, []byte(actionName))
 	requestBuf.WriteString(` xmlns:u="`)
+	//nolint:errcheck
 	xml.EscapeText(requestBuf, []byte(actionNamespace))
 	requestBuf.WriteString(`">`)
 	if inAction != nil {
 		if err := encodeRequestArgs(requestBuf, inAction); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "encoding request arguments")
 		}
 	}
 	requestBuf.WriteString(`</u:`)
+	//nolint:errcheck
 	xml.EscapeText(requestBuf, []byte(actionName))
 	requestBuf.WriteString(`>`)
 	requestBuf.WriteString(soapSuffix)
@@ -112,7 +133,7 @@ func encodeRequestAction(actionNamespace, actionName string, inAction interface{
 func encodeRequestArgs(w *bytes.Buffer, inAction interface{}) error {
 	in := reflect.Indirect(reflect.ValueOf(inAction))
 	if in.Kind() != reflect.Struct {
-		return fmt.Errorf("goupnp: SOAP inAction is not a struct but of type %v", in.Type())
+		return errors.Errorf("goupnp: SOAP inAction is not a struct but of type %v", in.Type())
 	}
 	enc := xml.NewEncoder(w)
 	nFields := in.NumField()
@@ -125,20 +146,24 @@ func encodeRequestArgs(w *bytes.Buffer, inAction interface{}) error {
 		}
 		value := in.Field(i)
 		if value.Kind() != reflect.String {
-			return fmt.Errorf("goupnp: SOAP arg %q is not of type string, but of type %v", argName, value.Type())
+			return errors.Errorf("goupnp: SOAP arg %q is not of type string, but of type %v", argName, value.Type())
 		}
-		elem := xml.StartElement{xml.Name{"", argName}, nil}
+		elem := xml.StartElement{Name: xml.Name{Local: argName}}
 		if err := enc.EncodeToken(elem); err != nil {
-			return fmt.Errorf("goupnp: error encoding start element for SOAP arg %q: %v", argName, err)
+			return errors.Wrapf(err, "goupnp: error encoding start element for SOAP arg %q", argName)
 		}
 		if err := enc.Flush(); err != nil {
-			return fmt.Errorf("goupnp: error flushing start element for SOAP arg %q: %v", argName, err)
+			return errors.Wrapf(err, "goupnp: error flushing start element for SOAP arg %q", argName)
 		}
-		if _, err := w.Write([]byte(escapeXMLText(value.Interface().(string)))); err != nil {
-			return fmt.Errorf("goupnp: error writing value for SOAP arg %q: %v", argName, err)
+		text := value.Interface().(string)
+		if !strings.HasPrefix(text, "<![CDATA") {
+			text = escapeXMLText(text)
+		}
+		if _, err := w.Write([]byte(text)); err != nil {
+			return errors.Wrapf(err, "goupnp: error writing value for SOAP arg %q: %v", argName)
 		}
 		if err := enc.EncodeToken(elem.End()); err != nil {
-			return fmt.Errorf("goupnp: error encoding end element for SOAP arg %q: %v", argName, err)
+			return errors.Wrapf(err, "goupnp: error encoding end element for SOAP arg %q: %v", argName)
 		}
 	}
 	enc.Flush()
@@ -170,10 +195,23 @@ func replaceEntity(s string) string {
 	return s
 }
 
+func (r *soapEnvelope) String() string {
+	return r.Body.String()
+}
+
 type soapEnvelope struct {
 	XMLName       xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope/ Envelope"`
 	EncodingStyle string   `xml:"http://schemas.xmlsoap.org/soap/envelope/ encodingStyle,attr"`
 	Body          soapBody `xml:"http://schemas.xmlsoap.org/soap/envelope/ Body"`
+}
+
+func (r *soapBody) String() string {
+	var buf bytes.Buffer
+	if r.Fault != nil {
+		fmt.Print(&buf, "fault:", *r.Fault, ",")
+	}
+	fmt.Fprint(&buf, "body:", string(r.RawAction))
+	return buf.String()
 }
 
 type soapBody struct {

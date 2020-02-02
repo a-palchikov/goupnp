@@ -9,15 +9,19 @@ import (
 	"os"
 	"path"
 	"regexp"
+
+	"github.com/pkg/errors"
 )
 
 func acquireFile(specFilename string, xmlSpecURL string) error {
-	if f, err := os.Open(specFilename); err != nil {
+	if fi, err := os.Stat(specFilename); err != nil {
 		if !os.IsNotExist(err) {
 			return err
 		}
 	} else {
-		f.Close()
+		if fi.IsDir() {
+			return errors.New("spec file is a directory")
+		}
 		return nil
 	}
 
@@ -28,20 +32,20 @@ func acquireFile(specFilename string, xmlSpecURL string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("could not download spec %q from %q: ",
+		return errors.Errorf("could not download spec %q from %q: %v",
 			specFilename, xmlSpecURL, resp.Status)
 	}
 
 	tmpFilename := specFilename + ".download"
 	w, err := os.Create(tmpFilename)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "creating temp file")
 	}
 	defer w.Close()
 
 	_, err = io.Copy(w, resp.Body)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "downloading")
 	}
 
 	return os.Rename(tmpFilename, specFilename)
@@ -81,7 +85,6 @@ func urnPartsFromSCPDFilename(filename string) (*URNParts, error) {
 	}
 	name, version := parts[1], parts[2]
 	return &URNParts{
-		URN:     serviceURNPrefix + name + ":" + version,
 		Name:    name,
 		Version: version,
 	}, nil

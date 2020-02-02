@@ -22,6 +22,7 @@ import (
 
 	"github.com/huin/goupnp"
 	"github.com/huin/goupnp/soap"
+	"github.com/pkg/errors"
 )
 
 // Hack to avoid Go complaining if time isn't used.
@@ -41,8 +42,8 @@ const ({{range .ServiceTypes}}
 {{$srv := .}}
 {{$srvIdent := printf "%s%s" .Name .Version}}
 
-// {{$srvIdent}} is a client for UPnP SOAP service with URN "{{.URN}}". See
-// goupnp.ServiceClient, which contains RootDevice and Service attributes which
+// {{$srvIdent}} is a client for UPnP SOAP service with URN "{{.URN}}".
+// See goupnp.ServiceClient, which contains RootDevice and Service attributes which
 // are provided for informational value.
 type {{$srvIdent}} struct {
 	goupnp.ServiceClient
@@ -54,13 +55,13 @@ type {{$srvIdent}} struct {
 // if the discovery process failed outright.
 //
 // This is a typical entry calling point into this package.
-func New{{$srvIdent}}Clients() (clients []*{{$srvIdent}}, errors []error, err error) {
+func New{{$srvIdent}}Clients() (clients []*{{$srvIdent}}, errs []error, err error) {
 	var genericClients []goupnp.ServiceClient
-	if genericClients, errors, err = goupnp.NewServiceClients({{$srv.Const}}); err != nil {
-		return
+	if genericClients, errs, err = goupnp.NewServiceClients({{$srv.Const}}); err != nil {
+		return nil, errs, errors.Wrap(err, "creating service clients")
 	}
 	clients = new{{$srvIdent}}ClientsFromGenericClients(genericClients)
-	return
+	return clients, errs, nil
 }
 
 // New{{$srvIdent}}ClientsByURL discovers instances of the service at the given
@@ -72,7 +73,7 @@ func New{{$srvIdent}}Clients() (clients []*{{$srvIdent}}, errors []error, err er
 func New{{$srvIdent}}ClientsByURL(loc *url.URL) ([]*{{$srvIdent}}, error) {
 	genericClients, err := goupnp.NewServiceClientsByURL(loc, {{$srv.Const}})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating service clients")
 	}
 	return new{{$srvIdent}}ClientsFromGenericClients(genericClients), nil
 }
@@ -88,7 +89,7 @@ func New{{$srvIdent}}ClientsByURL(loc *url.URL) ([]*{{$srvIdent}}, error) {
 func New{{$srvIdent}}ClientsFromRootDevice(rootDevice *goupnp.RootDevice, loc *url.URL) ([]*{{$srvIdent}}, error) {
 	genericClients, err := goupnp.NewServiceClientsFromRootDevice(rootDevice, loc, {{$srv.Const}})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating service clients")
 	}
 	return new{{$srvIdent}}ClientsFromGenericClients(genericClients), nil
 }
@@ -105,49 +106,41 @@ func new{{$srvIdent}}ClientsFromGenericClients(genericClients []goupnp.ServiceCl
 
 {{$winargs := $srv.WrapArguments .InputArguments}}
 {{$woutargs := $srv.WrapArguments .OutputArguments}}
+
+// {{$srvIdent}}{{.Name}}Request describes the request for {{$srvIdent}}.{{.Name}} API
+type {{$srvIdent}}{{.Name}}Request struct {
+	{{- range $winargs -}}
+	{{if .HasDoc}}
+	// {{.Name}}: {{.Document}}{{end}}
+	{{.AsParameter}}{{end}}
+}
+
+// {{$srvIdent}}{{.Name}}Response describes the response for {{$srvIdent}}.{{.Name}} API
+type {{$srvIdent}}{{.Name}}Response struct {
+	{{- range $woutargs -}}
+	{{if .HasDoc}}
+	// {{.Name}}: {{.Document}}{{end}}
+	{{.AsParameter}}{{end}}
+}
+
 {{if $winargs.HasDoc}}
 //
-// Arguments:{{range $winargs}}{{if .HasDoc}}
+// Arguments:
 //
-// * {{.Name}}: {{.Document}}{{end}}{{end}}{{end}}
-{{if $woutargs.HasDoc}}
+//  {{$srvIdent}}{{.Name}}Request{{end}}
+{{- if $woutargs.HasDoc}}
 //
-// Return values:{{range $woutargs}}{{if .HasDoc}}
+// Return value:
 //
-// * {{.Name}}: {{.Document}}{{end}}{{end}}{{end}}
-func (client *{{$srvIdent}}) {{.Name}}({{range $winargs -}}
-{{.AsParameter}}, {{end -}}
-) ({{range $woutargs -}}
-{{.AsParameter}}, {{end}} err error) {
-	// Request structure.
-	request := {{if $winargs}}&{{template "argstruct" $winargs}}{{"{}"}}{{else}}{{"interface{}(nil)"}}{{end}}
-	// BEGIN Marshal arguments into request.
-{{range $winargs}}
-	if request.{{.Name}}, err = {{.Marshal}}; err != nil {
-		return
-	}{{end}}
-	// END Marshal arguments into request.
-
-	// Response structure.
-	response := {{if $woutargs}}&{{template "argstruct" $woutargs}}{{"{}"}}{{else}}{{"interface{}(nil)"}}{{end}}
-
+//  {{$srvIdent}}{{.Name}}Response{{end}}
+func (client *{{$srvIdent}}) {{.Name}}(request {{$srvIdent}}{{.Name}}Request) (response *{{$srvIdent}}{{.Name}}Response, err error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction({{$srv.URNParts.Const}}, "{{.Name}}", request, response); err != nil {
-		return
+	if err = client.SOAPClient.PerformAction({{$srv.URNParts.Const}}, "{{.Name}}", {{if $winargs}}&request{{else}}nil{{end}}, {{if $woutargs}}response{{else}}nil{{end}}); err != nil {
+		return nil, errors.Wrap(err, "performing SOAP request")
 	}
 
-	// BEGIN Unmarshal arguments from response.
-{{range $woutargs}}
-	if {{.Name}}, err = {{.Unmarshal "response"}}; err != nil {
-		return
-	}{{end}}
-	// END Unmarshal arguments from response.
-	return
+	return response, nil
 }
 {{end}}
 {{end}}
-
-{{define "argstruct"}}struct {{"{"}}
-{{range .}}{{.Name}} string
-{{end}}{{"}"}}{{end}}
 `))

@@ -11,6 +11,8 @@ import (
 )
 
 // Use discovered WANPPPConnection1 services to find external IP addresses.
+// FIXME:
+// nolint:govet
 func Example_WANPPPConnection1_GetExternalIPAddress() {
 	clients, errors, err := internetgateway1.NewWANPPPConnection1Clients()
 	extIPClients := make([]GetExternalIPAddresser, len(clients))
@@ -22,6 +24,8 @@ func Example_WANPPPConnection1_GetExternalIPAddress() {
 }
 
 // Use discovered WANIPConnection services to find external IP addresses.
+// FIXME:
+// nolint:govet
 func Example_WANIPConnection_GetExternalIPAddress() {
 	clients, errors, err := internetgateway1.NewWANIPConnection1Clients()
 	extIPClients := make([]GetExternalIPAddresser, len(clients))
@@ -63,6 +67,8 @@ func DisplayExternalIPResults(clients []GetExternalIPAddresser, errors []error, 
 	}
 }
 
+// FIXME:
+// nolint:govet
 func Example_ReuseDiscoveredDevice() {
 	var allMaybeRootDevices []goupnp.MaybeRootDevice
 	for _, urn := range []string{internetgateway1.URN_WANPPPConnection_1, internetgateway1.URN_WANIPConnection_1} {
@@ -95,6 +101,8 @@ func Example_ReuseDiscoveredDevice() {
 
 // Use discovered igd1.WANCommonInterfaceConfig1 services to discover byte
 // transfer counts.
+// FIXME:
+// nolint:govet
 func Example_WANCommonInterfaceConfig1_GetBytesTransferred() {
 	clients, errors, err := internetgateway1.NewWANCommonInterfaceConfig1Clients()
 	if err != nil {
@@ -122,6 +130,8 @@ func Example_WANCommonInterfaceConfig1_GetBytesTransferred() {
 
 // Use discovered igd2.WANCommonInterfaceConfig1 services to discover byte
 // transfer counts.
+// FIXME:
+// nolint:govet
 func Example_WANCommonInterfaceConfig2_GetBytesTransferred() {
 	clients, errors, err := internetgateway2.NewWANCommonInterfaceConfig1Clients()
 	if err != nil {

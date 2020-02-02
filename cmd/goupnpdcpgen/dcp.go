@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/huin/goupnp"
 	"github.com/huin/goupnp/scpd"
 	"github.com/huin/goutil/codegen"
+	"github.com/pkg/errors"
 )
 
 // DCP collects together information about a UPnP Device Control Protocol.
@@ -31,17 +33,17 @@ func newDCP(metadata DCPMetadata) *DCP {
 func (dcp *DCP) processZipFile(filename string) error {
 	archive, err := zip.OpenReader(filename)
 	if err != nil {
-		return fmt.Errorf("error reading zip file %q: %v", filename, err)
+		return errors.Wrapf(err, "error reading zip file %q", filename)
 	}
 	defer archive.Close()
 	for _, deviceFile := range globFiles("*/device/*.xml", archive) {
 		if err := dcp.processDeviceFile(deviceFile); err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process device file %q", deviceFile)
 		}
 	}
 	for _, scpdFile := range globFiles("*/service/*.xml", archive) {
 		if err := dcp.processSCPDFile(scpdFile); err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process service file %q", scpdFile)
 		}
 	}
 	return nil
@@ -51,6 +53,13 @@ func (dcp *DCP) processDeviceFile(file *zip.File) error {
 	var device goupnp.Device
 	if err := unmarshalXmlFile(file, &device); err != nil {
 		return fmt.Errorf("error decoding device XML from file %q: %v", file.Name, err)
+	}
+	if len(device.Services) == 0 {
+		var rootDevice goupnp.RootDevice
+		if err := unmarshalXmlFile(file, &rootDevice); err != nil {
+			return fmt.Errorf("error decoding root device XML from file %q: %v", file.Name, err)
+		}
+		device = rootDevice.Device
 	}
 	var mainErr error
 	device.VisitDevices(func(d *goupnp.Device) {
@@ -76,18 +85,18 @@ func (dcp *DCP) processDeviceFile(file *zip.File) error {
 func (dcp *DCP) writeCode(outFile string, useGofmt bool) error {
 	packageFile, err := os.Create(outFile)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "creating file %q", outFile)
 	}
 	var output io.WriteCloser = packageFile
 	if useGofmt {
 		if output, err = codegen.NewGofmtWriteCloser(output); err != nil {
 			packageFile.Close()
-			return err
+			return errors.Wrap(err, "formatting source")
 		}
 	}
 	if err = packageTmpl.Execute(output, dcp); err != nil {
 		output.Close()
-		return err
+		return errors.Wrap(err, "rendering code template")
 	}
 	return output.Close()
 }
@@ -95,18 +104,28 @@ func (dcp *DCP) writeCode(outFile string, useGofmt bool) error {
 func (dcp *DCP) processSCPDFile(file *zip.File) error {
 	scpd := new(scpd.SCPD)
 	if err := unmarshalXmlFile(file, scpd); err != nil {
-		return fmt.Errorf("error decoding SCPD XML from file %q: %v", file.Name, err)
+		return errors.Wrapf(err, "error decoding SCPD XML from file %q: %v", file.Name)
 	}
 	scpd.Clean()
 	urnParts, err := urnPartsFromSCPDFilename(file.Name)
 	if err != nil {
-		return fmt.Errorf("could not recognize SCPD filename %q: %v", file.Name, err)
+		return errors.Wrapf(err, "could not recognize SCPD filename %q: %v", file.Name)
 	}
+	urnParts.URN = dcp.serviceByName(urnParts.Name, urnParts.Version)
 	dcp.Services = append(dcp.Services, SCPDWithURN{
 		URNParts: urnParts,
 		SCPD:     scpd,
 	})
 	return nil
+}
+
+func (dcp *DCP) serviceByName(name, version string) (urn string) {
+	for _, urn := range dcp.ServiceTypes {
+		if urn.Name == name {
+			return urn.URN
+		}
+	}
+	return fmt.Sprintf("urn:schemas-upnp-org:service:%v:%v", name, version)
 }
 
 type SCPDWithURN struct {
@@ -129,11 +148,13 @@ func (s *SCPDWithURN) WrapArguments(args []*scpd.Argument) (argumentWrapperList,
 func (s *SCPDWithURN) wrapArgument(arg *scpd.Argument) (*argumentWrapper, error) {
 	relVar := s.SCPD.GetStateVariable(arg.RelatedStateVariable)
 	if relVar == nil {
-		return nil, fmt.Errorf("no such state variable: %q, for argument %q", arg.RelatedStateVariable, arg.Name)
+		return nil, errors.Errorf("no such state variable %q for argument %q",
+			arg.RelatedStateVariable, arg.Name)
 	}
 	cnv, ok := typeConvs[relVar.DataType.Name]
 	if !ok {
-		return nil, fmt.Errorf("unknown data type: %q, for state variable %q, for argument %q", relVar.DataType.Type, arg.RelatedStateVariable, arg.Name)
+		return nil, errors.Errorf("unknown data type %q for state variable %q for argument %q",
+			relVar.DataType.Type, arg.RelatedStateVariable, arg.Name)
 	}
 	return &argumentWrapper{
 		Argument: *arg,
@@ -142,15 +163,16 @@ func (s *SCPDWithURN) wrapArgument(arg *scpd.Argument) (*argumentWrapper, error)
 	}, nil
 }
 
-type argumentWrapper struct {
-	scpd.Argument
-	relVar *scpd.StateVariable
-	conv   conv
+func (args argumentWrapperList) HasDoc() bool {
+	for _, arg := range args {
+		if arg.HasDoc() {
+			return true
+		}
+	}
+	return false
 }
 
-func (arg *argumentWrapper) AsParameter() string {
-	return fmt.Sprintf("%s %s", arg.Name, arg.conv.ExtType)
-}
+type argumentWrapperList []*argumentWrapper
 
 func (arg *argumentWrapper) HasDoc() bool {
 	rng := arg.relVar.AllowedValueRange
@@ -179,23 +201,16 @@ func (arg *argumentWrapper) Document() string {
 	return ""
 }
 
-func (arg *argumentWrapper) Marshal() string {
-	return fmt.Sprintf("soap.Marshal%s(%s)", arg.conv.FuncSuffix, arg.Name)
+func (arg *argumentWrapper) AsParameter() string {
+	return fmt.Sprintf("%s %s", arg.Name, arg.conv)
 }
 
-func (arg *argumentWrapper) Unmarshal(objVar string) string {
-	return fmt.Sprintf("soap.Unmarshal%s(%s.%s)", arg.conv.FuncSuffix, objVar, arg.Name)
-}
-
-type argumentWrapperList []*argumentWrapper
-
-func (args argumentWrapperList) HasDoc() bool {
-	for _, arg := range args {
-		if arg.HasDoc() {
-			return true
-		}
-	}
-	return false
+type argumentWrapper struct {
+	scpd.Argument
+	relVar *scpd.StateVariable
+	// conv represents the target type in package soap
+	// capable of (de-)serializing to/from SOAP
+	conv string
 }
 
 type URNParts struct {
@@ -209,13 +224,15 @@ func (u *URNParts) Const() string {
 }
 
 // extractURNParts extracts the name and version from a URN string.
-func extractURNParts(urn, expectedPrefix string) (*URNParts, error) {
-	if !strings.HasPrefix(urn, expectedPrefix) {
-		return nil, fmt.Errorf("%q does not have expected prefix %q", urn, expectedPrefix)
+func extractURNParts(urn string, expectedPrefix *regexp.Regexp) (*URNParts, error) {
+	loc := expectedPrefix.FindStringIndex(urn)
+	if loc == nil {
+		return nil, errors.Errorf("%q does not match expected prefix %q",
+			urn, expectedPrefix.String())
 	}
-	parts := strings.SplitN(strings.TrimPrefix(urn, expectedPrefix), ":", 2)
+	parts := strings.SplitN(urn[loc[1]:], ":", 2)
 	if len(parts) != 2 {
-		return nil, fmt.Errorf("%q does not have a name and version", urn)
+		return nil, errors.Errorf("%q does not have a name and version", urn)
 	}
 	name, version := parts[0], parts[1]
 	return &URNParts{urn, name, version}, nil

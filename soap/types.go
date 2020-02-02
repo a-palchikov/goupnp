@@ -1,16 +1,17 @@
 package soap
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -20,141 +21,508 @@ var (
 	localLoc = time.Local
 )
 
-func MarshalUi1(v uint8) (string, error) {
-	return strconv.FormatUint(uint64(v), 10), nil
+// Ui1 represents a SOAP byte
+type Ui1 uint8
+
+func (r Ui1) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(uint64(r), 10)), nil
 }
 
-func UnmarshalUi1(s string) (uint8, error) {
-	v, err := strconv.ParseUint(s, 10, 8)
-	return uint8(v), err
-}
-
-func MarshalUi2(v uint16) (string, error) {
-	return strconv.FormatUint(uint64(v), 10), nil
-}
-
-func UnmarshalUi2(s string) (uint16, error) {
-	v, err := strconv.ParseUint(s, 10, 16)
-	return uint16(v), err
-}
-
-func MarshalUi4(v uint32) (string, error) {
-	return strconv.FormatUint(uint64(v), 10), nil
-}
-
-func UnmarshalUi4(s string) (uint32, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
-	return uint32(v), err
-}
-
-func MarshalUi8(v uint64) (string, error) {
-	return strconv.FormatUint(v, 10), nil
-}
-
-func UnmarshalUi8(s string) (uint64, error) {
-	v, err := strconv.ParseUint(s, 10, 64)
-	return uint64(v), err
-}
-
-func MarshalI1(v int8) (string, error) {
-	return strconv.FormatInt(int64(v), 10), nil
-}
-
-func UnmarshalI1(s string) (int8, error) {
-	v, err := strconv.ParseInt(s, 10, 8)
-	return int8(v), err
-}
-
-func MarshalI2(v int16) (string, error) {
-	return strconv.FormatInt(int64(v), 10), nil
-}
-
-func UnmarshalI2(s string) (int16, error) {
-	v, err := strconv.ParseInt(s, 10, 16)
-	return int16(v), err
-}
-
-func MarshalI4(v int32) (string, error) {
-	return strconv.FormatInt(int64(v), 10), nil
-}
-
-func UnmarshalI4(s string) (int32, error) {
-	v, err := strconv.ParseInt(s, 10, 32)
-	return int32(v), err
-}
-
-func MarshalInt(v int64) (string, error) {
-	return strconv.FormatInt(v, 10), nil
-}
-
-func UnmarshalInt(s string) (int64, error) {
-	return strconv.ParseInt(s, 10, 64)
-}
-
-func MarshalR4(v float32) (string, error) {
-	return strconv.FormatFloat(float64(v), 'G', -1, 32), nil
-}
-
-func UnmarshalR4(s string) (float32, error) {
-	v, err := strconv.ParseFloat(s, 32)
-	return float32(v), err
-}
-
-func MarshalR8(v float64) (string, error) {
-	return strconv.FormatFloat(v, 'G', -1, 64), nil
-}
-
-func UnmarshalR8(s string) (float64, error) {
-	v, err := strconv.ParseFloat(s, 64)
-	return float64(v), err
-}
-
-// MarshalFixed14_4 marshals float64 to SOAP "fixed.14.4" type.
-func MarshalFixed14_4(v float64) (string, error) {
-	if v >= 1e14 || v <= -1e14 {
-		return "", fmt.Errorf("soap fixed14.4: value %v out of bounds", v)
+func (r *Ui1) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseUint(string(text), 10, 8)
+	if err != nil {
+		return err
 	}
-	return strconv.FormatFloat(v, 'f', 4, 64), nil
+	*r = Ui1(v)
+	return nil
+}
+
+// Ui2 represents a SOAP word
+type Ui2 uint16
+
+func (r Ui2) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(uint64(r), 10)), nil
+}
+
+func (r *Ui2) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseUint(string(text), 10, 16)
+	if err != nil {
+		return err
+	}
+	*r = Ui2(v)
+	return nil
+}
+
+// Ui4 represents a SOAP double word
+type Ui4 uint32
+
+func (r Ui4) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(uint64(r), 10)), nil
+}
+
+func (r *Ui4) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseUint(string(text), 10, 32)
+	if err != nil {
+		return err
+	}
+	*r = Ui4(v)
+	return nil
+}
+
+// Ui8 represents a SOAP quad word
+type Ui8 uint64
+
+func (r Ui8) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(uint64(r), 10)), nil
+}
+
+func (r *Ui8) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseUint(string(text), 10, 64)
+	if err != nil {
+		return err
+	}
+	*r = Ui8(v)
+	return nil
+}
+
+// I1 represents a SOAP signed byte
+type I1 int8
+
+func (r I1) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatInt(int64(r), 10)), nil
+}
+
+func (r *I1) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseInt(string(text), 10, 8)
+	if err != nil {
+		return err
+	}
+	*r = I1(v)
+	return nil
+}
+
+// I2 represents a SOAP signed word
+type I2 int16
+
+func (r I2) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatInt(int64(r), 10)), nil
+}
+
+func (r *I2) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseInt(string(text), 10, 16)
+	if err != nil {
+		return err
+	}
+	*r = I2(v)
+	return nil
+}
+
+// I4 represents a SOAP signed double word
+type I4 int32
+
+func (r I4) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatInt(int64(r), 10)), nil
+}
+
+func (r *I4) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseInt(string(text), 10, 32)
+	if err != nil {
+		return err
+	}
+	*r = I4(v)
+	return nil
+}
+
+// Int represents a SOAP signed quad word
+type Int int64
+
+func (r Int) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatInt(int64(r), 10)), nil
+}
+
+func (r *Int) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseInt(string(text), 10, 64)
+	if err != nil {
+		return err
+	}
+	*r = Int(v)
+	return nil
+}
+
+// R4 represents a SOAP float
+type R4 float32
+
+func (r R4) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatFloat(float64(r), 'G', -1, 32)), nil
+}
+
+func (r *R4) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseFloat(string(text), 32)
+	if err != nil {
+		return err
+	}
+	*r = R4(v)
+	return nil
+}
+
+// R8 represents a SOAP big float
+type R8 float64
+
+func (r R8) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatFloat(float64(r), 'G', -1, 64)), nil
+}
+
+func (r *R8) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseFloat(string(text), 64)
+	if err != nil {
+		return err
+	}
+	*r = R8(v)
+	return nil
+}
+
+// Fixed14_4 represents a SOAP "fixed.14.4" type
+type Fixed14_4 float64
+
+// MarshalText marshals this to SOAP "fixed.14.4" type.
+func (r Fixed14_4) MarshalText() ([]byte, error) {
+	if r >= 1e14 || r <= -1e14 {
+		return nil, fmt.Errorf("soap fixed14.4: value %v out of bounds", r)
+	}
+	return []byte(strconv.FormatFloat(float64(r), 'f', 4, 64)), nil
 }
 
 // UnmarshalFixed14_4 unmarshals float64 from SOAP "fixed.14.4" type.
-func UnmarshalFixed14_4(s string) (float64, error) {
-	v, err := strconv.ParseFloat(s, 64)
+func (r *Fixed14_4) UnmarshalText(text []byte) error {
+	v, err := strconv.ParseFloat(string(text), 64)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	if v >= 1e14 || v <= -1e14 {
-		return 0, fmt.Errorf("soap fixed14.4: value %q out of bounds", s)
+		return errors.Errorf("soap fixed14.4: value %q out of bounds", text)
 	}
-	return v, nil
+	*r = Fixed14_4(v)
+	return nil
 }
 
-// MarshalChar marshals rune to SOAP "char" type.
-func MarshalChar(v rune) (string, error) {
-	if v == 0 {
-		return "", errors.New("soap char: rune 0 is not allowed")
+// Char represents the SOAP "char" type
+type Char rune
+
+// MarshalText marshals this to SOAP "char" type.
+func (r Char) MarshalText() ([]byte, error) {
+	if r == 0 {
+		return nil, errors.New("soap char: rune 0 is not allowed")
 	}
-	return string(v), nil
+	return []byte(string(r)), nil
 }
 
 // UnmarshalChar unmarshals rune from SOAP "char" type.
-func UnmarshalChar(s string) (rune, error) {
-	if len(s) == 0 {
-		return 0, errors.New("soap char: got empty string")
+func (r *Char) UnmarshalText(text []byte) error {
+	if len(text) == 0 {
+		return errors.New("soap char: got empty string")
 	}
-	r, n := utf8.DecodeRune([]byte(s))
-	if n != len(s) {
-		return 0, fmt.Errorf("soap char: value %q is not a single rune", s)
+	rn, n := utf8.DecodeRune(text)
+	if n != len(text) {
+		return errors.Errorf("soap char: value %q is not a single rune", text)
 	}
-	return r, nil
+	*r = Char(rn)
+	return nil
 }
 
-func MarshalString(v string) (string, error) {
-	return v, nil
+type String string
+
+// MarshalText returns this string as a byte slice
+func (r String) MarshalText() ([]byte, error) {
+	return []byte(r), nil
 }
 
-func UnmarshalString(v string) (string, error) {
-	return v, nil
+// UnmarshalText interprets text as string
+func (r *String) UnmarshalText(text []byte) error {
+	*r = String(text)
+	return nil
+}
+
+// Date represents a SOAP "date" type
+type Date time.Time
+
+// MarshalText marshals time.Time to SOAP "date" type. Note that this converts
+// to local time, and discards the time-of-day components.
+func (r Date) MarshalText() ([]byte, error) {
+	return []byte((time.Time)(r).In(localLoc).Format("2006-01-02")), nil
+}
+
+// UnmarshalText unmarshals time.Time from SOAP "date" type. This outputs the
+// date as midnight in the local time zone.
+func (r *Date) UnmarshalText(text []byte) error {
+	year, month, day, err := parseDateParts(string(text))
+	if err != nil {
+		return err
+	}
+	*r = Date(time.Date(year, time.Month(month), day, 0, 0, 0, 0, localLoc))
+	return nil
+}
+
+// TimeOfDay is used in cases where SOAP "time" or "time.tz" is used.
+type TimeOfDay struct {
+	// Duration of time since midnight.
+	FromMidnight time.Duration
+
+	// Set to true if Offset is specified. If false, then the timezone is
+	// unspecified (and by ISO8601 - implies some "local" time).
+	HasOffset bool
+
+	// Offset is non-zero only if time.tz is used. It is otherwise ignored. If
+	// non-zero, then it is regarded as a UTC offset in seconds. Note that the
+	// sub-minutes is ignored by the marshal function.
+	Offset int
+}
+
+// MarshalText marshals TimeOfDay to the "time" type.
+func (r TimeOfDay) MarshalText() ([]byte, error) {
+	d := int64(r.FromMidnight / time.Second)
+	hour := d / 3600
+	d = d % 3600
+	minute := d / 60
+	second := d % 60
+
+	return []byte(fmt.Sprintf("%02d:%02d:%02d", hour, minute, second)), nil
+}
+
+// UnmarshalText unmarshals TimeOfDay from the "time" type.
+func (r *TimeOfDay) UnmarshalText(text []byte) error {
+	var t TimeOfDayTz
+	if err := t.UnmarshalText(text); err != nil {
+		return err
+	} else if t.HasOffset {
+		return errors.Errorf("soap time: value %q contains unexpected timezone", text)
+	}
+	*r = TimeOfDay(t)
+	return nil
+}
+
+type TimeOfDayTz TimeOfDay
+
+// MarshalTimeOfDayTz marshals TimeOfDay to the "time.tz" type.
+func (r TimeOfDayTz) MarshalText() ([]byte, error) {
+	d := int64(r.FromMidnight / time.Second)
+	hour := d / 3600
+	d = d % 3600
+	minute := d / 60
+	second := d % 60
+
+	tz := ""
+	if r.HasOffset {
+		if r.Offset == 0 {
+			tz = "Z"
+		} else {
+			offsetMins := r.Offset / 60
+			sign := '+'
+			if offsetMins < 1 {
+				offsetMins = -offsetMins
+				sign = '-'
+			}
+			tz = fmt.Sprintf("%c%02d:%02d", sign, offsetMins/60, offsetMins%60)
+		}
+	}
+
+	return []byte(fmt.Sprintf("%02d:%02d:%02d%s", hour, minute, second, tz)), nil
+}
+
+// UnmarshalText unmarshals TimeOfDay from the "time.tz" type.
+func (r *TimeOfDayTz) UnmarshalText(text []byte) (err error) {
+	zoneIndex := bytes.IndexAny(text, "Z+-")
+	var timePart string
+	var hasOffset bool
+	var offset int
+	if zoneIndex == -1 {
+		hasOffset = false
+		timePart = string(text)
+	} else {
+		hasOffset = true
+		timePart = string(text[:zoneIndex])
+		if offset, err = parseTimezone(string(text[zoneIndex:])); err != nil {
+			return err
+		}
+	}
+
+	hour, minute, second, err := parseTimeParts(timePart)
+	if err != nil {
+		return err
+	}
+
+	fromMidnight := time.Duration(hour*3600+minute*60+second) * time.Second
+
+	// ISO8601 special case - values up to 24:00:00 are allowed, so using
+	// strictly greater-than for the maximum value.
+	if fromMidnight > 24*time.Hour || minute >= 60 || second >= 60 {
+		return errors.Errorf("soap time.tz: value %q has value(s) out of range", text)
+	}
+
+	*r = TimeOfDayTz{
+		FromMidnight: time.Duration(hour*3600+minute*60+second) * time.Second,
+		HasOffset:    hasOffset,
+		Offset:       offset,
+	}
+	return nil
+}
+
+// DateTime represents SAOP "dateTime" type
+type DateTime time.Time
+
+// MarshalText marshals time.Time to SOAP "dateTime" type. Note that this
+// converts to local time.
+func (r DateTime) MarshalText() ([]byte, error) {
+	return []byte((time.Time)(r).In(localLoc).Format("2006-01-02T15:04:05")), nil
+}
+
+// UnmarshalText unmarshals time.Time from the SOAP "dateTime" type. This
+// returns a value in the local timezone.
+func (r *DateTime) UnmarshalText(text []byte) (err error) {
+	dateStr, timeStr, zoneStr, err := splitCompleteDateTimeZone(string(text))
+	if err != nil {
+		return err
+	}
+
+	if len(zoneStr) != 0 {
+		return errors.Errorf("soap datetime: unexpected timezone in %q", text)
+	}
+
+	year, month, day, err := parseDateParts(dateStr)
+	if err != nil {
+		return err
+	}
+
+	var hour, minute, second int
+	if len(timeStr) != 0 {
+		hour, minute, second, err = parseTimeParts(timeStr)
+		if err != nil {
+			return err
+		}
+	}
+
+	*r = DateTime(time.Date(year, time.Month(month), day, hour, minute, second, 0, localLoc))
+	return nil
+}
+
+// DateTimeTz represents SAOP "dateTime.tz" type
+type DateTimeTz time.Time
+
+// MarshalText marshals time.Time to SOAP "dateTime.tz" type.
+func (r DateTimeTz) MarshalText() ([]byte, error) {
+	return []byte((time.Time)(r).Format("2006-01-02T15:04:05-07:00")), nil
+}
+
+// UnmarshalText unmarshals time.Time from the SOAP "dateTime.tz" type.
+// This returns a value in the local timezone when the timezone is unspecified.
+func (r *DateTimeTz) UnmarshalText(text []byte) (err error) {
+	dateStr, timeStr, zoneStr, err := splitCompleteDateTimeZone(string(text))
+	if err != nil {
+		return err
+	}
+
+	year, month, day, err := parseDateParts(dateStr)
+	if err != nil {
+		return err
+	}
+
+	var hour, minute, second int
+	var location *time.Location = localLoc
+	if len(timeStr) != 0 {
+		hour, minute, second, err = parseTimeParts(timeStr)
+		if err != nil {
+			return
+		}
+		if len(zoneStr) != 0 {
+			var offset int
+			offset, err = parseTimezone(zoneStr)
+			if offset == 0 {
+				location = time.UTC
+			} else {
+				location = time.FixedZone("", offset)
+			}
+		}
+	}
+
+	*r = DateTimeTz(time.Date(year, time.Month(month), day, hour, minute, second, 0, location))
+	return nil
+}
+
+// Bool represents SOAP "boolean" type
+type Bool bool
+
+// MarshalText marshals bool to SOAP "boolean" type.
+func (r Bool) MarshalText() ([]byte, error) {
+	if r {
+		return []byte("1"), nil
+	}
+	return []byte("0"), nil
+}
+
+// UnmarshalText unmarshals bool from the SOAP "boolean" type.
+func (r *Bool) UnmarshalText(text []byte) error {
+	switch string(text) {
+	case "0", "false", "no":
+		*r = Bool(false)
+		return nil
+	case "1", "true", "yes":
+		*r = Bool(true)
+		return nil
+	}
+	return errors.Errorf("soap boolean: %q is not a valid boolean value", text)
+}
+
+// BinBase64 represents SOAP "bin.base64" type
+type BinBase64 []byte
+
+// MarshalText marshals []byte to SOAP "bin.base64" type.
+func (r BinBase64) MarshalText() ([]byte, error) {
+	buf := make([]byte, base64.StdEncoding.EncodedLen(len(r)))
+	base64.StdEncoding.Encode(buf, r)
+	return buf, nil
+}
+
+// UnmarshalText unmarshals []byte from the SOAP "bin.base64" type.
+func (r *BinBase64) Unmarshal(text []byte) error {
+	buf := make([]byte, base64.StdEncoding.DecodedLen(len(text)))
+	base64.StdEncoding.Decode(buf, text)
+	*r = BinBase64(buf)
+	return nil
+}
+
+// BinHex represents SOAP "bin.hex" type
+type BinHex []byte
+
+// MarshalBinHex marshals []byte to SOAP "bin.hex" type.
+func (r BinHex) MarshalText() ([]byte, error) {
+	buf := make([]byte, hex.EncodedLen(len(r)))
+	hex.Encode(buf, r)
+	return buf, nil
+}
+
+// UnmarshalText unmarshals []byte from the SOAP "bin.hex" type.
+func (r *BinHex) UnmarshalText(text []byte) error {
+	buf := make([]byte, hex.DecodedLen(len(text)))
+	hex.Decode(buf, text)
+	*r = BinHex(buf)
+	return nil
+}
+
+// URI represents SOAP "uri" type
+type URI url.URL
+
+// MarshalText marshals *url.URL to SOAP "uri" type.
+func (r URI) MarshalText() ([]byte, error) {
+	return []byte((*url.URL)(&r).String()), nil
+}
+
+// UnmarshalText unmarshals *url.URL from the SOAP "uri" type.
+func (r *URI) UnmarshaleText(text []byte) error {
+	u, err := url.Parse(string(text))
+	if err != nil {
+		return err
+	}
+	*r = URI(*u)
+	return nil
 }
 
 func parseInt(s string, err *error) int {
@@ -282,247 +650,4 @@ func splitCompleteDateTimeZone(s string) (dateStr, timeStr, zoneStr string, err 
 	timeStr = parts[2]
 	zoneStr = parts[3]
 	return
-}
-
-// MarshalDate marshals time.Time to SOAP "date" type. Note that this converts
-// to local time, and discards the time-of-day components.
-func MarshalDate(v time.Time) (string, error) {
-	return v.In(localLoc).Format("2006-01-02"), nil
-}
-
-var dateFmts = []string{"2006-01-02", "20060102"}
-
-// UnmarshalDate unmarshals time.Time from SOAP "date" type. This outputs the
-// date as midnight in the local time zone.
-func UnmarshalDate(s string) (time.Time, error) {
-	year, month, day, err := parseDateParts(s)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, localLoc), nil
-}
-
-// TimeOfDay is used in cases where SOAP "time" or "time.tz" is used.
-type TimeOfDay struct {
-	// Duration of time since midnight.
-	FromMidnight time.Duration
-
-	// Set to true if Offset is specified. If false, then the timezone is
-	// unspecified (and by ISO8601 - implies some "local" time).
-	HasOffset bool
-
-	// Offset is non-zero only if time.tz is used. It is otherwise ignored. If
-	// non-zero, then it is regarded as a UTC offset in seconds. Note that the
-	// sub-minutes is ignored by the marshal function.
-	Offset int
-}
-
-// MarshalTimeOfDay marshals TimeOfDay to the "time" type.
-func MarshalTimeOfDay(v TimeOfDay) (string, error) {
-	d := int64(v.FromMidnight / time.Second)
-	hour := d / 3600
-	d = d % 3600
-	minute := d / 60
-	second := d % 60
-
-	return fmt.Sprintf("%02d:%02d:%02d", hour, minute, second), nil
-}
-
-// UnmarshalTimeOfDay unmarshals TimeOfDay from the "time" type.
-func UnmarshalTimeOfDay(s string) (TimeOfDay, error) {
-	t, err := UnmarshalTimeOfDayTz(s)
-	if err != nil {
-		return TimeOfDay{}, err
-	} else if t.HasOffset {
-		return TimeOfDay{}, fmt.Errorf("soap time: value %q contains unexpected timezone", s)
-	}
-	return t, nil
-}
-
-// MarshalTimeOfDayTz marshals TimeOfDay to the "time.tz" type.
-func MarshalTimeOfDayTz(v TimeOfDay) (string, error) {
-	d := int64(v.FromMidnight / time.Second)
-	hour := d / 3600
-	d = d % 3600
-	minute := d / 60
-	second := d % 60
-
-	tz := ""
-	if v.HasOffset {
-		if v.Offset == 0 {
-			tz = "Z"
-		} else {
-			offsetMins := v.Offset / 60
-			sign := '+'
-			if offsetMins < 1 {
-				offsetMins = -offsetMins
-				sign = '-'
-			}
-			tz = fmt.Sprintf("%c%02d:%02d", sign, offsetMins/60, offsetMins%60)
-		}
-	}
-
-	return fmt.Sprintf("%02d:%02d:%02d%s", hour, minute, second, tz), nil
-}
-
-// UnmarshalTimeOfDayTz unmarshals TimeOfDay from the "time.tz" type.
-func UnmarshalTimeOfDayTz(s string) (tod TimeOfDay, err error) {
-	zoneIndex := strings.IndexAny(s, "Z+-")
-	var timePart string
-	var hasOffset bool
-	var offset int
-	if zoneIndex == -1 {
-		hasOffset = false
-		timePart = s
-	} else {
-		hasOffset = true
-		timePart = s[:zoneIndex]
-		if offset, err = parseTimezone(s[zoneIndex:]); err != nil {
-			return
-		}
-	}
-
-	hour, minute, second, err := parseTimeParts(timePart)
-	if err != nil {
-		return
-	}
-
-	fromMidnight := time.Duration(hour*3600+minute*60+second) * time.Second
-
-	// ISO8601 special case - values up to 24:00:00 are allowed, so using
-	// strictly greater-than for the maximum value.
-	if fromMidnight > 24*time.Hour || minute >= 60 || second >= 60 {
-		return TimeOfDay{}, fmt.Errorf("soap time.tz: value %q has value(s) out of range", s)
-	}
-
-	return TimeOfDay{
-		FromMidnight: time.Duration(hour*3600+minute*60+second) * time.Second,
-		HasOffset:    hasOffset,
-		Offset:       offset,
-	}, nil
-}
-
-// MarshalDateTime marshals time.Time to SOAP "dateTime" type. Note that this
-// converts to local time.
-func MarshalDateTime(v time.Time) (string, error) {
-	return v.In(localLoc).Format("2006-01-02T15:04:05"), nil
-}
-
-// UnmarshalDateTime unmarshals time.Time from the SOAP "dateTime" type. This
-// returns a value in the local timezone.
-func UnmarshalDateTime(s string) (result time.Time, err error) {
-	dateStr, timeStr, zoneStr, err := splitCompleteDateTimeZone(s)
-	if err != nil {
-		return
-	}
-
-	if len(zoneStr) != 0 {
-		err = fmt.Errorf("soap datetime: unexpected timezone in %q", s)
-		return
-	}
-
-	year, month, day, err := parseDateParts(dateStr)
-	if err != nil {
-		return
-	}
-
-	var hour, minute, second int
-	if len(timeStr) != 0 {
-		hour, minute, second, err = parseTimeParts(timeStr)
-		if err != nil {
-			return
-		}
-	}
-
-	result = time.Date(year, time.Month(month), day, hour, minute, second, 0, localLoc)
-	return
-}
-
-// MarshalDateTimeTz marshals time.Time to SOAP "dateTime.tz" type.
-func MarshalDateTimeTz(v time.Time) (string, error) {
-	return v.Format("2006-01-02T15:04:05-07:00"), nil
-}
-
-// UnmarshalDateTimeTz unmarshals time.Time from the SOAP "dateTime.tz" type.
-// This returns a value in the local timezone when the timezone is unspecified.
-func UnmarshalDateTimeTz(s string) (result time.Time, err error) {
-	dateStr, timeStr, zoneStr, err := splitCompleteDateTimeZone(s)
-	if err != nil {
-		return
-	}
-
-	year, month, day, err := parseDateParts(dateStr)
-	if err != nil {
-		return
-	}
-
-	var hour, minute, second int
-	var location *time.Location = localLoc
-	if len(timeStr) != 0 {
-		hour, minute, second, err = parseTimeParts(timeStr)
-		if err != nil {
-			return
-		}
-		if len(zoneStr) != 0 {
-			var offset int
-			offset, err = parseTimezone(zoneStr)
-			if offset == 0 {
-				location = time.UTC
-			} else {
-				location = time.FixedZone("", offset)
-			}
-		}
-	}
-
-	result = time.Date(year, time.Month(month), day, hour, minute, second, 0, location)
-	return
-}
-
-// MarshalBoolean marshals bool to SOAP "boolean" type.
-func MarshalBoolean(v bool) (string, error) {
-	if v {
-		return "1", nil
-	}
-	return "0", nil
-}
-
-// UnmarshalBoolean unmarshals bool from the SOAP "boolean" type.
-func UnmarshalBoolean(s string) (bool, error) {
-	switch s {
-	case "0", "false", "no":
-		return false, nil
-	case "1", "true", "yes":
-		return true, nil
-	}
-	return false, fmt.Errorf("soap boolean: %q is not a valid boolean value", s)
-}
-
-// MarshalBinBase64 marshals []byte to SOAP "bin.base64" type.
-func MarshalBinBase64(v []byte) (string, error) {
-	return base64.StdEncoding.EncodeToString(v), nil
-}
-
-// UnmarshalBinBase64 unmarshals []byte from the SOAP "bin.base64" type.
-func UnmarshalBinBase64(s string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(s)
-}
-
-// MarshalBinHex marshals []byte to SOAP "bin.hex" type.
-func MarshalBinHex(v []byte) (string, error) {
-	return hex.EncodeToString(v), nil
-}
-
-// UnmarshalBinHex unmarshals []byte from the SOAP "bin.hex" type.
-func UnmarshalBinHex(s string) ([]byte, error) {
-	return hex.DecodeString(s)
-}
-
-// MarshalURI marshals *url.URL to SOAP "uri" type.
-func MarshalURI(v *url.URL) (string, error) {
-	return v.String(), nil
-}
-
-// UnmarshalURI unmarshals *url.URL from the SOAP "uri" type.
-func UnmarshalURI(s string) (*url.URL, error) {
-	return url.Parse(s)
 }
