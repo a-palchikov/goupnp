@@ -21,7 +21,10 @@ var (
 	localLoc = time.Local
 )
 
-// Ui1 represents a SOAP byte
+// UPnP SOAP data types
+// Reference: http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v2.0.pdf
+
+// Ui1 represents a SOAP "ui1" type
 type Ui1 uint8
 
 func (r Ui1) MarshalText() ([]byte, error) {
@@ -37,7 +40,7 @@ func (r *Ui1) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Ui2 represents a SOAP word
+// Ui2 represents the SOAP "ui2" type
 type Ui2 uint16
 
 func (r Ui2) MarshalText() ([]byte, error) {
@@ -53,7 +56,7 @@ func (r *Ui2) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Ui4 represents a SOAP double word
+// Ui4 represents the SOAP "ui4" type
 type Ui4 uint32
 
 func (r Ui4) MarshalText() ([]byte, error) {
@@ -69,7 +72,7 @@ func (r *Ui4) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Ui8 represents a SOAP quad word
+// Ui8 represents the SOAP "ui8" type
 type Ui8 uint64
 
 func (r Ui8) MarshalText() ([]byte, error) {
@@ -85,7 +88,7 @@ func (r *Ui8) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// I1 represents a SOAP signed byte
+// I1 represents the SOAP "i1" type
 type I1 int8
 
 func (r I1) MarshalText() ([]byte, error) {
@@ -101,7 +104,7 @@ func (r *I1) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// I2 represents a SOAP signed word
+// I2 represents the SOAP "i2" type
 type I2 int16
 
 func (r I2) MarshalText() ([]byte, error) {
@@ -117,7 +120,7 @@ func (r *I2) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// I4 represents a SOAP signed double word
+// I4 represents the SOAP "i4" type
 type I4 int32
 
 func (r I4) MarshalText() ([]byte, error) {
@@ -133,7 +136,7 @@ func (r *I4) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Int represents a SOAP signed quad word
+// Int represents the SOAP "int" type
 type Int int64
 
 func (r Int) MarshalText() ([]byte, error) {
@@ -149,7 +152,7 @@ func (r *Int) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// R4 represents a SOAP float
+// R4 represents the SOAP "r4" type
 type R4 float32
 
 func (r R4) MarshalText() ([]byte, error) {
@@ -165,7 +168,7 @@ func (r *R4) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// R8 represents a SOAP big float
+// R8 represents the SOAP "r8" float
 type R8 float64
 
 func (r R8) MarshalText() ([]byte, error) {
@@ -181,13 +184,13 @@ func (r *R8) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Fixed14_4 represents a SOAP "fixed.14.4" type
+// Fixed14_4 represents the SOAP "fixed.14.4" type
 type Fixed14_4 float64
 
 // MarshalText marshals this to SOAP "fixed.14.4" type.
 func (r Fixed14_4) MarshalText() ([]byte, error) {
 	if r >= 1e14 || r <= -1e14 {
-		return nil, fmt.Errorf("soap fixed14.4: value %v out of bounds", r)
+		return nil, fmt.Errorf("soap fixed14_4: value %v out of bounds", r)
 	}
 	return []byte(strconv.FormatFloat(float64(r), 'f', 4, 64)), nil
 }
@@ -199,7 +202,7 @@ func (r *Fixed14_4) UnmarshalText(text []byte) error {
 		return err
 	}
 	if v >= 1e14 || v <= -1e14 {
-		return errors.Errorf("soap fixed14.4: value %q out of bounds", text)
+		return errors.Errorf("soap fixed14_4: value %q out of bounds", text)
 	}
 	*r = Fixed14_4(v)
 	return nil
@@ -229,6 +232,7 @@ func (r *Char) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// String represents the SOAP "string" type
 type String string
 
 // MarshalText returns this string as a byte slice
@@ -262,7 +266,7 @@ func (r *Date) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// TimeOfDay is used in cases where SOAP "time" or "time.tz" is used.
+// TimeOfDay implements the SOAP "time" or "time.tz" types
 type TimeOfDay struct {
 	// Duration of time since midnight.
 	FromMidnight time.Duration
@@ -300,6 +304,7 @@ func (r *TimeOfDay) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// TimeOfDayTz represents a SOAP "time.tz" type
 type TimeOfDayTz TimeOfDay
 
 // MarshalTimeOfDayTz marshals TimeOfDay to the "time.tz" type.
@@ -366,7 +371,7 @@ func (r *TimeOfDayTz) UnmarshalText(text []byte) (err error) {
 	return nil
 }
 
-// DateTime represents SAOP "dateTime" type
+// DateTime represents the SOAP "dateTime" type
 type DateTime time.Time
 
 // MarshalText marshals time.Time to SOAP "dateTime" type. Note that this
@@ -404,7 +409,7 @@ func (r *DateTime) UnmarshalText(text []byte) (err error) {
 	return nil
 }
 
-// DateTimeTz represents SAOP "dateTime.tz" type
+// DateTimeTz represents the SOAP "dateTime.tz" type
 type DateTimeTz time.Time
 
 // MarshalText marshals time.Time to SOAP "dateTime.tz" type.
@@ -435,6 +440,9 @@ func (r *DateTimeTz) UnmarshalText(text []byte) (err error) {
 		if len(zoneStr) != 0 {
 			var offset int
 			offset, err = parseTimezone(zoneStr)
+			if err != nil {
+				return errors.Wrap(err, "parsing timezone")
+			}
 			if offset == 0 {
 				location = time.UTC
 			} else {
@@ -447,7 +455,7 @@ func (r *DateTimeTz) UnmarshalText(text []byte) (err error) {
 	return nil
 }
 
-// Bool represents SOAP "boolean" type
+// Bool represents the SOAP "boolean" type
 type Bool bool
 
 // MarshalText marshals bool to SOAP "boolean" type.
@@ -471,7 +479,7 @@ func (r *Bool) UnmarshalText(text []byte) error {
 	return errors.Errorf("soap boolean: %q is not a valid boolean value", text)
 }
 
-// BinBase64 represents SOAP "bin.base64" type
+// BinBase64 represents the SOAP "bin.base64" type
 type BinBase64 []byte
 
 // MarshalText marshals []byte to SOAP "bin.base64" type.
@@ -482,14 +490,15 @@ func (r BinBase64) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText unmarshals []byte from the SOAP "bin.base64" type.
-func (r *BinBase64) Unmarshal(text []byte) error {
+func (r *BinBase64) UnmarshalText(text []byte) error {
 	buf := make([]byte, base64.StdEncoding.DecodedLen(len(text)))
+	//nolint:errcheck
 	base64.StdEncoding.Decode(buf, text)
 	*r = BinBase64(buf)
 	return nil
 }
 
-// BinHex represents SOAP "bin.hex" type
+// BinHex represents the SOAP "bin.hex" type
 type BinHex []byte
 
 // MarshalBinHex marshals []byte to SOAP "bin.hex" type.
@@ -502,12 +511,13 @@ func (r BinHex) MarshalText() ([]byte, error) {
 // UnmarshalText unmarshals []byte from the SOAP "bin.hex" type.
 func (r *BinHex) UnmarshalText(text []byte) error {
 	buf := make([]byte, hex.DecodedLen(len(text)))
+	//nolint:errcheck
 	hex.Decode(buf, text)
 	*r = BinHex(buf)
 	return nil
 }
 
-// URI represents SOAP "uri" type
+// URI represents the SOAP "uri" type
 type URI url.URL
 
 // MarshalText marshals *url.URL to SOAP "uri" type.
@@ -516,7 +526,7 @@ func (r URI) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText unmarshals *url.URL from the SOAP "uri" type.
-func (r *URI) UnmarshaleText(text []byte) error {
+func (r *URI) UnmarshalText(text []byte) error {
 	u, err := url.Parse(string(text))
 	if err != nil {
 		return err

@@ -28,10 +28,10 @@ import (
 // Hack to avoid Go complaining if time isn't used.
 var _ time.Time
 
-// Device URNs:
+{{if .DeviceTypes}}// Device URNs:
 const ({{range .DeviceTypes}}
 	{{.Const}} = "{{.URN}}"{{end}}
-)
+){{end}}
 
 // Service URNs:
 const ({{range .ServiceTypes}}
@@ -105,18 +105,20 @@ func new{{$srvIdent}}ClientsFromGenericClients(genericClients []goupnp.ServiceCl
 {{range .SCPD.Actions}}{{/* loops over *SCPDWithURN values */}}
 
 {{$winargs := $srv.WrapArguments .InputArguments}}
+{{$reqtype:= printf "%s%sRequest" $srvIdent .Name}}
 {{$woutargs := $srv.WrapArguments .OutputArguments}}
+{{$resptype:= printf "%s%sResponse" $srvIdent .Name}}
 
-// {{$srvIdent}}{{.Name}}Request describes the request for {{$srvIdent}}.{{.Name}} API
-type {{$srvIdent}}{{.Name}}Request struct {
+{{if $winargs}}// {{$reqtype}} describes the request for {{$srvIdent}}.{{.Name}} API
+type {{$reqtype}} struct {
 	{{- range $winargs -}}
 	{{if .HasDoc}}
 	// {{.Name}}: {{.Document}}{{end}}
 	{{.AsParameter}}{{end}}
-}
+}{{end}}
 
-// {{$srvIdent}}{{.Name}}Response describes the response for {{$srvIdent}}.{{.Name}} API
-type {{$srvIdent}}{{.Name}}Response struct {
+// {{$resptype}} describes the response for {{$srvIdent}}.{{.Name}} API
+type {{$resptype}} struct {
 	{{- range $woutargs -}}
 	{{if .HasDoc}}
 	// {{.Name}}: {{.Document}}{{end}}
@@ -127,19 +129,19 @@ type {{$srvIdent}}{{.Name}}Response struct {
 //
 // Arguments:
 //
-//  {{$srvIdent}}{{.Name}}Request{{end}}
+//  {{$reqtype}}{{end}}
 {{- if $woutargs.HasDoc}}
 //
 // Return value:
 //
-//  {{$srvIdent}}{{.Name}}Response{{end}}
-func (client *{{$srvIdent}}) {{.Name}}(request {{$srvIdent}}{{.Name}}Request) (response *{{$srvIdent}}{{.Name}}Response, err error) {
+//  {{$resptype}}{{end}}
+func (client *{{$srvIdent}}) {{.Name}}({{if $winargs}}request {{$reqtype}}{{end}}) (*{{$resptype}}, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction({{$srv.URNParts.Const}}, "{{.Name}}", {{if $winargs}}&request{{else}}nil{{end}}, {{if $woutargs}}response{{else}}nil{{end}}); err != nil {
+	var response {{$resptype}}
+	if err := client.SOAPClient.PerformAction({{$srv.URNParts.Const}}, "{{.Name}}", {{if $winargs}}&request{{else}}nil{{end}}, {{if $woutargs}}&response{{else}}nil{{end}}); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 {{end}}
 {{end}}

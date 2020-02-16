@@ -38,12 +38,12 @@ func (dcp *DCP) processZipFile(filename string) error {
 	defer archive.Close()
 	for _, deviceFile := range globFiles("*/device/*.xml", archive) {
 		if err := dcp.processDeviceFile(deviceFile); err != nil {
-			return errors.Wrapf(err, "failed to process device file %q", deviceFile)
+			return errors.Wrapf(err, "failed to process device file %q", deviceFile.Name)
 		}
 	}
 	for _, scpdFile := range globFiles("*/service/*.xml", archive) {
 		if err := dcp.processSCPDFile(scpdFile); err != nil {
-			return errors.Wrapf(err, "failed to process service file %q", scpdFile)
+			return errors.Wrapf(err, "failed to process service file %q", scpdFile.Name)
 		}
 	}
 	return nil
@@ -104,12 +104,12 @@ func (dcp *DCP) writeCode(outFile string, useGofmt bool) error {
 func (dcp *DCP) processSCPDFile(file *zip.File) error {
 	scpd := new(scpd.SCPD)
 	if err := unmarshalXmlFile(file, scpd); err != nil {
-		return errors.Wrapf(err, "error decoding SCPD XML from file %q: %v", file.Name)
+		return errors.Wrapf(err, "error decoding SCPD XML from file %q", file.Name)
 	}
 	scpd.Clean()
 	urnParts, err := urnPartsFromSCPDFilename(file.Name)
 	if err != nil {
-		return errors.Wrapf(err, "could not recognize SCPD filename %q: %v", file.Name)
+		return errors.Wrapf(err, "could not recognize SCPD filename %q", file.Name)
 	}
 	urnParts.URN = dcp.serviceByName(urnParts.Name, urnParts.Version)
 	dcp.Services = append(dcp.Services, SCPDWithURN{
@@ -121,7 +121,7 @@ func (dcp *DCP) processSCPDFile(file *zip.File) error {
 
 func (dcp *DCP) serviceByName(name, version string) (urn string) {
 	for _, urn := range dcp.ServiceTypes {
-		if urn.Name == name {
+		if urn.Name == name && urn.Version == version {
 			return urn.URN
 		}
 	}

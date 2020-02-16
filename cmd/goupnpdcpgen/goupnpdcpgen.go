@@ -29,7 +29,7 @@ func main() {
 
 func run(dcpName, specsDir string, useGofmt bool) error {
 	if err := os.MkdirAll(specsDir, os.ModePerm); err != nil {
-		return errors.Wrapf(err, "could not create specs-dir %q: %v\n", specsDir)
+		return errors.Wrapf(err, "could not create specs-dir %q", specsDir)
 	}
 
 	for _, d := range dcpMetadata {

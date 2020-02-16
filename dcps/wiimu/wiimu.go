@@ -110,13 +110,13 @@ type AVTransport1GetMuteResponse struct {
 // Arguments:
 //
 //  AVTransport1GetMuteRequest
-func (client *AVTransport1) GetMute(request AVTransport1GetMuteRequest) (response *AVTransport1GetMuteResponse, err error) {
+func (client *AVTransport1) GetMute(request AVTransport1GetMuteRequest) (*AVTransport1GetMuteResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetMute", &request, response); err != nil {
+	var response AVTransport1GetMuteResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetMute", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetVolumeRequest describes the request for AVTransport1.GetVolume API
@@ -140,13 +140,13 @@ type AVTransport1GetVolumeResponse struct {
 // Return value:
 //
 //  AVTransport1GetVolumeResponse
-func (client *AVTransport1) GetVolume(request AVTransport1GetVolumeRequest) (response *AVTransport1GetVolumeResponse, err error) {
+func (client *AVTransport1) GetVolume(request AVTransport1GetVolumeRequest) (*AVTransport1GetVolumeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetVolume", &request, response); err != nil {
+	var response AVTransport1GetVolumeResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetVolume", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetChannelRequest describes the request for AVTransport1.GetChannel API
@@ -165,13 +165,13 @@ type AVTransport1GetChannelResponse struct {
 // Arguments:
 //
 //  AVTransport1GetChannelRequest
-func (client *AVTransport1) GetChannel(request AVTransport1GetChannelRequest) (response *AVTransport1GetChannelResponse, err error) {
+func (client *AVTransport1) GetChannel(request AVTransport1GetChannelRequest) (*AVTransport1GetChannelResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetChannel", &request, response); err != nil {
+	var response AVTransport1GetChannelResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetChannel", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetEqualizerRequest describes the request for AVTransport1.GetEqualizer API
@@ -190,13 +190,13 @@ type AVTransport1GetEqualizerResponse struct {
 // Arguments:
 //
 //  AVTransport1GetEqualizerRequest
-func (client *AVTransport1) GetEqualizer(request AVTransport1GetEqualizerRequest) (response *AVTransport1GetEqualizerResponse, err error) {
+func (client *AVTransport1) GetEqualizer(request AVTransport1GetEqualizerRequest) (*AVTransport1GetEqualizerResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetEqualizer", &request, response); err != nil {
+	var response AVTransport1GetEqualizerResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetEqualizer", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1ListPresetsRequest describes the request for AVTransport1.ListPresets API
@@ -209,13 +209,13 @@ type AVTransport1ListPresetsResponse struct {
 	CurrentPresetNameList soap.String
 }
 
-func (client *AVTransport1) ListPresets(request AVTransport1ListPresetsRequest) (response *AVTransport1ListPresetsResponse, err error) {
+func (client *AVTransport1) ListPresets(request AVTransport1ListPresetsRequest) (*AVTransport1ListPresetsResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "ListPresets", &request, response); err != nil {
+	var response AVTransport1ListPresetsResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "ListPresets", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SelectPresetRequest describes the request for AVTransport1.SelectPreset API
@@ -233,13 +233,13 @@ type AVTransport1SelectPresetResponse struct {
 // Arguments:
 //
 //  AVTransport1SelectPresetRequest
-func (client *AVTransport1) SelectPreset(request AVTransport1SelectPresetRequest) (response *AVTransport1SelectPresetResponse, err error) {
+func (client *AVTransport1) SelectPreset(request AVTransport1SelectPresetRequest) (*AVTransport1SelectPresetResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SelectPreset", &request, nil); err != nil {
+	var response AVTransport1SelectPresetResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SelectPreset", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetMuteRequest describes the request for AVTransport1.SetMute API
@@ -258,13 +258,13 @@ type AVTransport1SetMuteResponse struct {
 // Arguments:
 //
 //  AVTransport1SetMuteRequest
-func (client *AVTransport1) SetMute(request AVTransport1SetMuteRequest) (response *AVTransport1SetMuteResponse, err error) {
+func (client *AVTransport1) SetMute(request AVTransport1SetMuteRequest) (*AVTransport1SetMuteResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetMute", &request, nil); err != nil {
+	var response AVTransport1SetMuteResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetMute", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetVolumeRequest describes the request for AVTransport1.SetVolume API
@@ -284,13 +284,13 @@ type AVTransport1SetVolumeResponse struct {
 // Arguments:
 //
 //  AVTransport1SetVolumeRequest
-func (client *AVTransport1) SetVolume(request AVTransport1SetVolumeRequest) (response *AVTransport1SetVolumeResponse, err error) {
+func (client *AVTransport1) SetVolume(request AVTransport1SetVolumeRequest) (*AVTransport1SetVolumeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetVolume", &request, nil); err != nil {
+	var response AVTransport1SetVolumeResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetVolume", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetChannelRequest describes the request for AVTransport1.SetChannel API
@@ -309,13 +309,13 @@ type AVTransport1SetChannelResponse struct {
 // Arguments:
 //
 //  AVTransport1SetChannelRequest
-func (client *AVTransport1) SetChannel(request AVTransport1SetChannelRequest) (response *AVTransport1SetChannelResponse, err error) {
+func (client *AVTransport1) SetChannel(request AVTransport1SetChannelRequest) (*AVTransport1SetChannelResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetChannel", &request, nil); err != nil {
+	var response AVTransport1SetChannelResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetChannel", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetEqualizerRequest describes the request for AVTransport1.SetEqualizer API
@@ -334,13 +334,13 @@ type AVTransport1SetEqualizerResponse struct {
 // Arguments:
 //
 //  AVTransport1SetEqualizerRequest
-func (client *AVTransport1) SetEqualizer(request AVTransport1SetEqualizerRequest) (response *AVTransport1SetEqualizerResponse, err error) {
+func (client *AVTransport1) SetEqualizer(request AVTransport1SetEqualizerRequest) (*AVTransport1SetEqualizerResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetEqualizer", &request, nil); err != nil {
+	var response AVTransport1SetEqualizerResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetEqualizer", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetSimpleDeviceInfoRequest describes the request for AVTransport1.GetSimpleDeviceInfo API
@@ -363,13 +363,13 @@ type AVTransport1GetSimpleDeviceInfoResponse struct {
 // Return value:
 //
 //  AVTransport1GetSimpleDeviceInfoResponse
-func (client *AVTransport1) GetSimpleDeviceInfo(request AVTransport1GetSimpleDeviceInfoRequest) (response *AVTransport1GetSimpleDeviceInfoResponse, err error) {
+func (client *AVTransport1) GetSimpleDeviceInfo(request AVTransport1GetSimpleDeviceInfoRequest) (*AVTransport1GetSimpleDeviceInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetSimpleDeviceInfo", &request, response); err != nil {
+	var response AVTransport1GetSimpleDeviceInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetSimpleDeviceInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetControlDeviceInfoRequest describes the request for AVTransport1.GetControlDeviceInfo API
@@ -395,13 +395,13 @@ type AVTransport1GetControlDeviceInfoResponse struct {
 // Return value:
 //
 //  AVTransport1GetControlDeviceInfoResponse
-func (client *AVTransport1) GetControlDeviceInfo(request AVTransport1GetControlDeviceInfoRequest) (response *AVTransport1GetControlDeviceInfoResponse, err error) {
+func (client *AVTransport1) GetControlDeviceInfo(request AVTransport1GetControlDeviceInfoRequest) (*AVTransport1GetControlDeviceInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetControlDeviceInfo", &request, response); err != nil {
+	var response AVTransport1GetControlDeviceInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetControlDeviceInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1MultiPlaySlaveMaskRequest describes the request for AVTransport1.MultiPlaySlaveMask API
@@ -414,13 +414,13 @@ type AVTransport1MultiPlaySlaveMaskRequest struct {
 type AVTransport1MultiPlaySlaveMaskResponse struct {
 }
 
-func (client *AVTransport1) MultiPlaySlaveMask(request AVTransport1MultiPlaySlaveMaskRequest) (response *AVTransport1MultiPlaySlaveMaskResponse, err error) {
+func (client *AVTransport1) MultiPlaySlaveMask(request AVTransport1MultiPlaySlaveMaskRequest) (*AVTransport1MultiPlaySlaveMaskResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "MultiPlaySlaveMask", &request, nil); err != nil {
+	var response AVTransport1MultiPlaySlaveMaskResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "MultiPlaySlaveMask", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetAlarmQueueRequest describes the request for AVTransport1.SetAlarmQueue API
@@ -432,13 +432,13 @@ type AVTransport1SetAlarmQueueRequest struct {
 type AVTransport1SetAlarmQueueResponse struct {
 }
 
-func (client *AVTransport1) SetAlarmQueue(request AVTransport1SetAlarmQueueRequest) (response *AVTransport1SetAlarmQueueResponse, err error) {
+func (client *AVTransport1) SetAlarmQueue(request AVTransport1SetAlarmQueueRequest) (*AVTransport1SetAlarmQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetAlarmQueue", &request, nil); err != nil {
+	var response AVTransport1SetAlarmQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetAlarmQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1GetAlarmQueueRequest describes the request for AVTransport1.GetAlarmQueue API
@@ -451,13 +451,13 @@ type AVTransport1GetAlarmQueueResponse struct {
 	AlarmContext soap.String
 }
 
-func (client *AVTransport1) GetAlarmQueue(request AVTransport1GetAlarmQueueRequest) (response *AVTransport1GetAlarmQueueResponse, err error) {
+func (client *AVTransport1) GetAlarmQueue(request AVTransport1GetAlarmQueueRequest) (*AVTransport1GetAlarmQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "GetAlarmQueue", &request, response); err != nil {
+	var response AVTransport1GetAlarmQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "GetAlarmQueue", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1DeleteAlarmQueueRequest describes the request for AVTransport1.DeleteAlarmQueue API
@@ -469,13 +469,13 @@ type AVTransport1DeleteAlarmQueueRequest struct {
 type AVTransport1DeleteAlarmQueueResponse struct {
 }
 
-func (client *AVTransport1) DeleteAlarmQueue(request AVTransport1DeleteAlarmQueueRequest) (response *AVTransport1DeleteAlarmQueueResponse, err error) {
+func (client *AVTransport1) DeleteAlarmQueue(request AVTransport1DeleteAlarmQueueRequest) (*AVTransport1DeleteAlarmQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "DeleteAlarmQueue", &request, nil); err != nil {
+	var response AVTransport1DeleteAlarmQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "DeleteAlarmQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // AVTransport1SetDeviceNameRequest describes the request for AVTransport1.SetDeviceName API
@@ -487,13 +487,13 @@ type AVTransport1SetDeviceNameRequest struct {
 type AVTransport1SetDeviceNameResponse struct {
 }
 
-func (client *AVTransport1) SetDeviceName(request AVTransport1SetDeviceNameRequest) (response *AVTransport1SetDeviceNameResponse, err error) {
+func (client *AVTransport1) SetDeviceName(request AVTransport1SetDeviceNameRequest) (*AVTransport1SetDeviceNameResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_AVTransport_1, "SetDeviceName", &request, nil); err != nil {
+	var response AVTransport1SetDeviceNameResponse
+	if err := client.SOAPClient.PerformAction(URN_AVTransport_1, "SetDeviceName", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // ConnectionManager1 is a client for UPnP SOAP service with URN "urn:schemas-upnp-org:service:ConnectionManager:1".
@@ -556,22 +556,18 @@ func newConnectionManager1ClientsFromGenericClients(genericClients []goupnp.Serv
 	return clients
 }
 
-// ConnectionManager1GetCurrentConnectionIDsRequest describes the request for ConnectionManager1.GetCurrentConnectionIDs API
-type ConnectionManager1GetCurrentConnectionIDsRequest struct {
-}
-
 // ConnectionManager1GetCurrentConnectionIDsResponse describes the response for ConnectionManager1.GetCurrentConnectionIDs API
 type ConnectionManager1GetCurrentConnectionIDsResponse struct {
 	ConnectionIDs soap.String
 }
 
-func (client *ConnectionManager1) GetCurrentConnectionIDs(request ConnectionManager1GetCurrentConnectionIDsRequest) (response *ConnectionManager1GetCurrentConnectionIDsResponse, err error) {
+func (client *ConnectionManager1) GetCurrentConnectionIDs() (*ConnectionManager1GetCurrentConnectionIDsResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetCurrentConnectionIDs", nil, response); err != nil {
+	var response ConnectionManager1GetCurrentConnectionIDsResponse
+	if err := client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetCurrentConnectionIDs", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // ConnectionManager1GetCurrentConnectionInfoRequest describes the request for ConnectionManager1.GetCurrentConnectionInfo API
@@ -596,17 +592,13 @@ type ConnectionManager1GetCurrentConnectionInfoResponse struct {
 // Return value:
 //
 //  ConnectionManager1GetCurrentConnectionInfoResponse
-func (client *ConnectionManager1) GetCurrentConnectionInfo(request ConnectionManager1GetCurrentConnectionInfoRequest) (response *ConnectionManager1GetCurrentConnectionInfoResponse, err error) {
+func (client *ConnectionManager1) GetCurrentConnectionInfo(request ConnectionManager1GetCurrentConnectionInfoRequest) (*ConnectionManager1GetCurrentConnectionInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetCurrentConnectionInfo", &request, response); err != nil {
+	var response ConnectionManager1GetCurrentConnectionInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetCurrentConnectionInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// ConnectionManager1GetProtocolInfoRequest describes the request for ConnectionManager1.GetProtocolInfo API
-type ConnectionManager1GetProtocolInfoRequest struct {
+	return &response, nil
 }
 
 // ConnectionManager1GetProtocolInfoResponse describes the response for ConnectionManager1.GetProtocolInfo API
@@ -615,13 +607,13 @@ type ConnectionManager1GetProtocolInfoResponse struct {
 	Sink   soap.String
 }
 
-func (client *ConnectionManager1) GetProtocolInfo(request ConnectionManager1GetProtocolInfoRequest) (response *ConnectionManager1GetProtocolInfoResponse, err error) {
+func (client *ConnectionManager1) GetProtocolInfo() (*ConnectionManager1GetProtocolInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetProtocolInfo", nil, response); err != nil {
+	var response ConnectionManager1GetProtocolInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_ConnectionManager_1, "GetProtocolInfo", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1 is a client for UPnP SOAP service with URN "urn:schemas-wiimu-com:service:PlayQueue:1".
@@ -693,13 +685,13 @@ type PlayQueue1CreateQueueRequest struct {
 type PlayQueue1CreateQueueResponse struct {
 }
 
-func (client *PlayQueue1) CreateQueue(request PlayQueue1CreateQueueRequest) (response *PlayQueue1CreateQueueResponse, err error) {
+func (client *PlayQueue1) CreateQueue(request PlayQueue1CreateQueueRequest) (*PlayQueue1CreateQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "CreateQueue", &request, nil); err != nil {
+	var response PlayQueue1CreateQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "CreateQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1ReplaceQueueRequest describes the request for PlayQueue1.ReplaceQueue API
@@ -711,13 +703,13 @@ type PlayQueue1ReplaceQueueRequest struct {
 type PlayQueue1ReplaceQueueResponse struct {
 }
 
-func (client *PlayQueue1) ReplaceQueue(request PlayQueue1ReplaceQueueRequest) (response *PlayQueue1ReplaceQueueResponse, err error) {
+func (client *PlayQueue1) ReplaceQueue(request PlayQueue1ReplaceQueueRequest) (*PlayQueue1ReplaceQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "ReplaceQueue", &request, nil); err != nil {
+	var response PlayQueue1ReplaceQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "ReplaceQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1DeleteQueueRequest describes the request for PlayQueue1.DeleteQueue API
@@ -729,13 +721,13 @@ type PlayQueue1DeleteQueueRequest struct {
 type PlayQueue1DeleteQueueResponse struct {
 }
 
-func (client *PlayQueue1) DeleteQueue(request PlayQueue1DeleteQueueRequest) (response *PlayQueue1DeleteQueueResponse, err error) {
+func (client *PlayQueue1) DeleteQueue(request PlayQueue1DeleteQueueRequest) (*PlayQueue1DeleteQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteQueue", &request, nil); err != nil {
+	var response PlayQueue1DeleteQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1BackUpQueueRequest describes the request for PlayQueue1.BackUpQueue API
@@ -747,13 +739,13 @@ type PlayQueue1BackUpQueueRequest struct {
 type PlayQueue1BackUpQueueResponse struct {
 }
 
-func (client *PlayQueue1) BackUpQueue(request PlayQueue1BackUpQueueRequest) (response *PlayQueue1BackUpQueueResponse, err error) {
+func (client *PlayQueue1) BackUpQueue(request PlayQueue1BackUpQueueRequest) (*PlayQueue1BackUpQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "BackUpQueue", &request, nil); err != nil {
+	var response PlayQueue1BackUpQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "BackUpQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1AppendQueueRequest describes the request for PlayQueue1.AppendQueue API
@@ -765,13 +757,13 @@ type PlayQueue1AppendQueueRequest struct {
 type PlayQueue1AppendQueueResponse struct {
 }
 
-func (client *PlayQueue1) AppendQueue(request PlayQueue1AppendQueueRequest) (response *PlayQueue1AppendQueueResponse, err error) {
+func (client *PlayQueue1) AppendQueue(request PlayQueue1AppendQueueRequest) (*PlayQueue1AppendQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendQueue", &request, nil); err != nil {
+	var response PlayQueue1AppendQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1BrowseQueueRequest describes the request for PlayQueue1.BrowseQueue API
@@ -784,13 +776,13 @@ type PlayQueue1BrowseQueueResponse struct {
 	QueueContext soap.String
 }
 
-func (client *PlayQueue1) BrowseQueue(request PlayQueue1BrowseQueueRequest) (response *PlayQueue1BrowseQueueResponse, err error) {
+func (client *PlayQueue1) BrowseQueue(request PlayQueue1BrowseQueueRequest) (*PlayQueue1BrowseQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "BrowseQueue", &request, response); err != nil {
+	var response PlayQueue1BrowseQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "BrowseQueue", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetQueueLoopModeRequest describes the request for PlayQueue1.SetQueueLoopMode API
@@ -802,17 +794,13 @@ type PlayQueue1SetQueueLoopModeRequest struct {
 type PlayQueue1SetQueueLoopModeResponse struct {
 }
 
-func (client *PlayQueue1) SetQueueLoopMode(request PlayQueue1SetQueueLoopModeRequest) (response *PlayQueue1SetQueueLoopModeResponse, err error) {
+func (client *PlayQueue1) SetQueueLoopMode(request PlayQueue1SetQueueLoopModeRequest) (*PlayQueue1SetQueueLoopModeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueueLoopMode", &request, nil); err != nil {
+	var response PlayQueue1SetQueueLoopModeResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueueLoopMode", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// PlayQueue1GetQueueLoopModeRequest describes the request for PlayQueue1.GetQueueLoopMode API
-type PlayQueue1GetQueueLoopModeRequest struct {
+	return &response, nil
 }
 
 // PlayQueue1GetQueueLoopModeResponse describes the response for PlayQueue1.GetQueueLoopMode API
@@ -820,13 +808,13 @@ type PlayQueue1GetQueueLoopModeResponse struct {
 	LoopMode soap.Ui4
 }
 
-func (client *PlayQueue1) GetQueueLoopMode(request PlayQueue1GetQueueLoopModeRequest) (response *PlayQueue1GetQueueLoopModeResponse, err error) {
+func (client *PlayQueue1) GetQueueLoopMode() (*PlayQueue1GetQueueLoopModeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueLoopMode", nil, response); err != nil {
+	var response PlayQueue1GetQueueLoopModeResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueLoopMode", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetQueuePolicyRequest describes the request for PlayQueue1.SetQueuePolicy API
@@ -838,13 +826,13 @@ type PlayQueue1SetQueuePolicyRequest struct {
 type PlayQueue1SetQueuePolicyResponse struct {
 }
 
-func (client *PlayQueue1) SetQueuePolicy(request PlayQueue1SetQueuePolicyRequest) (response *PlayQueue1SetQueuePolicyResponse, err error) {
+func (client *PlayQueue1) SetQueuePolicy(request PlayQueue1SetQueuePolicyRequest) (*PlayQueue1SetQueuePolicyResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueuePolicy", &request, nil); err != nil {
+	var response PlayQueue1SetQueuePolicyResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueuePolicy", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1PlayQueueWithIndexRequest describes the request for PlayQueue1.PlayQueueWithIndex API
@@ -857,13 +845,13 @@ type PlayQueue1PlayQueueWithIndexRequest struct {
 type PlayQueue1PlayQueueWithIndexResponse struct {
 }
 
-func (client *PlayQueue1) PlayQueueWithIndex(request PlayQueue1PlayQueueWithIndexRequest) (response *PlayQueue1PlayQueueWithIndexResponse, err error) {
+func (client *PlayQueue1) PlayQueueWithIndex(request PlayQueue1PlayQueueWithIndexRequest) (*PlayQueue1PlayQueueWithIndexResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "PlayQueueWithIndex", &request, nil); err != nil {
+	var response PlayQueue1PlayQueueWithIndexResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "PlayQueueWithIndex", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1AppendTracksInQueueRequest describes the request for PlayQueue1.AppendTracksInQueue API
@@ -875,13 +863,13 @@ type PlayQueue1AppendTracksInQueueRequest struct {
 type PlayQueue1AppendTracksInQueueResponse struct {
 }
 
-func (client *PlayQueue1) AppendTracksInQueue(request PlayQueue1AppendTracksInQueueRequest) (response *PlayQueue1AppendTracksInQueueResponse, err error) {
+func (client *PlayQueue1) AppendTracksInQueue(request PlayQueue1AppendTracksInQueueRequest) (*PlayQueue1AppendTracksInQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendTracksInQueue", &request, nil); err != nil {
+	var response PlayQueue1AppendTracksInQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendTracksInQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1RemoveTracksInQueueRequest describes the request for PlayQueue1.RemoveTracksInQueue API
@@ -895,13 +883,13 @@ type PlayQueue1RemoveTracksInQueueRequest struct {
 type PlayQueue1RemoveTracksInQueueResponse struct {
 }
 
-func (client *PlayQueue1) RemoveTracksInQueue(request PlayQueue1RemoveTracksInQueueRequest) (response *PlayQueue1RemoveTracksInQueueResponse, err error) {
+func (client *PlayQueue1) RemoveTracksInQueue(request PlayQueue1RemoveTracksInQueueRequest) (*PlayQueue1RemoveTracksInQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "RemoveTracksInQueue", &request, nil); err != nil {
+	var response PlayQueue1RemoveTracksInQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "RemoveTracksInQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1AppendTracksInQueueExRequest describes the request for PlayQueue1.AppendTracksInQueueEx API
@@ -915,13 +903,13 @@ type PlayQueue1AppendTracksInQueueExRequest struct {
 type PlayQueue1AppendTracksInQueueExResponse struct {
 }
 
-func (client *PlayQueue1) AppendTracksInQueueEx(request PlayQueue1AppendTracksInQueueExRequest) (response *PlayQueue1AppendTracksInQueueExResponse, err error) {
+func (client *PlayQueue1) AppendTracksInQueueEx(request PlayQueue1AppendTracksInQueueExRequest) (*PlayQueue1AppendTracksInQueueExResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendTracksInQueueEx", &request, nil); err != nil {
+	var response PlayQueue1AppendTracksInQueueExResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "AppendTracksInQueueEx", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetKeyMappingRequest describes the request for PlayQueue1.SetKeyMapping API
@@ -933,17 +921,13 @@ type PlayQueue1SetKeyMappingRequest struct {
 type PlayQueue1SetKeyMappingResponse struct {
 }
 
-func (client *PlayQueue1) SetKeyMapping(request PlayQueue1SetKeyMappingRequest) (response *PlayQueue1SetKeyMappingResponse, err error) {
+func (client *PlayQueue1) SetKeyMapping(request PlayQueue1SetKeyMappingRequest) (*PlayQueue1SetKeyMappingResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetKeyMapping", &request, nil); err != nil {
+	var response PlayQueue1SetKeyMappingResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetKeyMapping", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// PlayQueue1GetKeyMappingRequest describes the request for PlayQueue1.GetKeyMapping API
-type PlayQueue1GetKeyMappingRequest struct {
+	return &response, nil
 }
 
 // PlayQueue1GetKeyMappingResponse describes the response for PlayQueue1.GetKeyMapping API
@@ -951,13 +935,13 @@ type PlayQueue1GetKeyMappingResponse struct {
 	QueueContext soap.String
 }
 
-func (client *PlayQueue1) GetKeyMapping(request PlayQueue1GetKeyMappingRequest) (response *PlayQueue1GetKeyMappingResponse, err error) {
+func (client *PlayQueue1) GetKeyMapping() (*PlayQueue1GetKeyMappingResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetKeyMapping", nil, response); err != nil {
+	var response PlayQueue1GetKeyMappingResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetKeyMapping", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1GetQueueOnlineRequest describes the request for PlayQueue1.GetQueueOnline API
@@ -974,13 +958,13 @@ type PlayQueue1GetQueueOnlineResponse struct {
 	QueueContext soap.String
 }
 
-func (client *PlayQueue1) GetQueueOnline(request PlayQueue1GetQueueOnlineRequest) (response *PlayQueue1GetQueueOnlineResponse, err error) {
+func (client *PlayQueue1) GetQueueOnline(request PlayQueue1GetQueueOnlineRequest) (*PlayQueue1GetQueueOnlineResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueOnline", &request, response); err != nil {
+	var response PlayQueue1GetQueueOnlineResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueOnline", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SearchQueueOnlineRequest describes the request for PlayQueue1.SearchQueueOnline API
@@ -995,13 +979,13 @@ type PlayQueue1SearchQueueOnlineResponse struct {
 	QueueContext soap.String
 }
 
-func (client *PlayQueue1) SearchQueueOnline(request PlayQueue1SearchQueueOnlineRequest) (response *PlayQueue1SearchQueueOnlineResponse, err error) {
+func (client *PlayQueue1) SearchQueueOnline(request PlayQueue1SearchQueueOnlineRequest) (*PlayQueue1SearchQueueOnlineResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SearchQueueOnline", &request, response); err != nil {
+	var response PlayQueue1SearchQueueOnlineResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SearchQueueOnline", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetQueueRecordRequest describes the request for PlayQueue1.SetQueueRecord API
@@ -1015,13 +999,13 @@ type PlayQueue1SetQueueRecordRequest struct {
 type PlayQueue1SetQueueRecordResponse struct {
 }
 
-func (client *PlayQueue1) SetQueueRecord(request PlayQueue1SetQueueRecordRequest) (response *PlayQueue1SetQueueRecordResponse, err error) {
+func (client *PlayQueue1) SetQueueRecord(request PlayQueue1SetQueueRecordRequest) (*PlayQueue1SetQueueRecordResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueueRecord", &request, nil); err != nil {
+	var response PlayQueue1SetQueueRecordResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetQueueRecord", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetSongsRecordRequest describes the request for PlayQueue1.SetSongsRecord API
@@ -1035,13 +1019,13 @@ type PlayQueue1SetSongsRecordRequest struct {
 type PlayQueue1SetSongsRecordResponse struct {
 }
 
-func (client *PlayQueue1) SetSongsRecord(request PlayQueue1SetSongsRecordRequest) (response *PlayQueue1SetSongsRecordResponse, err error) {
+func (client *PlayQueue1) SetSongsRecord(request PlayQueue1SetSongsRecordRequest) (*PlayQueue1SetSongsRecordResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetSongsRecord", &request, nil); err != nil {
+	var response PlayQueue1SetSongsRecordResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetSongsRecord", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1UserRegisterRequest describes the request for PlayQueue1.UserRegister API
@@ -1056,13 +1040,13 @@ type PlayQueue1UserRegisterResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) UserRegister(request PlayQueue1UserRegisterRequest) (response *PlayQueue1UserRegisterResponse, err error) {
+func (client *PlayQueue1) UserRegister(request PlayQueue1UserRegisterRequest) (*PlayQueue1UserRegisterResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserRegister", &request, response); err != nil {
+	var response PlayQueue1UserRegisterResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserRegister", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1UserLoginRequest describes the request for PlayQueue1.UserLogin API
@@ -1080,13 +1064,13 @@ type PlayQueue1UserLoginResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) UserLogin(request PlayQueue1UserLoginRequest) (response *PlayQueue1UserLoginResponse, err error) {
+func (client *PlayQueue1) UserLogin(request PlayQueue1UserLoginRequest) (*PlayQueue1UserLoginResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserLogin", &request, response); err != nil {
+	var response PlayQueue1UserLoginResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserLogin", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1UserLogoutRequest describes the request for PlayQueue1.UserLogout API
@@ -1099,13 +1083,13 @@ type PlayQueue1UserLogoutResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) UserLogout(request PlayQueue1UserLogoutRequest) (response *PlayQueue1UserLogoutResponse, err error) {
+func (client *PlayQueue1) UserLogout(request PlayQueue1UserLogoutRequest) (*PlayQueue1UserLogoutResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserLogout", &request, response); err != nil {
+	var response PlayQueue1UserLogoutResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "UserLogout", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1GetUserInfoRequest describes the request for PlayQueue1.GetUserInfo API
@@ -1118,13 +1102,13 @@ type PlayQueue1GetUserInfoResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) GetUserInfo(request PlayQueue1GetUserInfoRequest) (response *PlayQueue1GetUserInfoResponse, err error) {
+func (client *PlayQueue1) GetUserInfo(request PlayQueue1GetUserInfoRequest) (*PlayQueue1GetUserInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserInfo", &request, response); err != nil {
+	var response PlayQueue1GetUserInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1GetUserAccountHistoryRequest describes the request for PlayQueue1.GetUserAccountHistory API
@@ -1138,13 +1122,13 @@ type PlayQueue1GetUserAccountHistoryResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) GetUserAccountHistory(request PlayQueue1GetUserAccountHistoryRequest) (response *PlayQueue1GetUserAccountHistoryResponse, err error) {
+func (client *PlayQueue1) GetUserAccountHistory(request PlayQueue1GetUserAccountHistoryRequest) (*PlayQueue1GetUserAccountHistoryResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserAccountHistory", &request, response); err != nil {
+	var response PlayQueue1GetUserAccountHistoryResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserAccountHistory", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetUserFavoritesRequest describes the request for PlayQueue1.SetUserFavorites API
@@ -1161,13 +1145,13 @@ type PlayQueue1SetUserFavoritesResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) SetUserFavorites(request PlayQueue1SetUserFavoritesRequest) (response *PlayQueue1SetUserFavoritesResponse, err error) {
+func (client *PlayQueue1) SetUserFavorites(request PlayQueue1SetUserFavoritesRequest) (*PlayQueue1SetUserFavoritesResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetUserFavorites", &request, response); err != nil {
+	var response PlayQueue1SetUserFavoritesResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetUserFavorites", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1GetUserFavoritesRequest describes the request for PlayQueue1.GetUserFavorites API
@@ -1182,13 +1166,13 @@ type PlayQueue1GetUserFavoritesResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) GetUserFavorites(request PlayQueue1GetUserFavoritesRequest) (response *PlayQueue1GetUserFavoritesResponse, err error) {
+func (client *PlayQueue1) GetUserFavorites(request PlayQueue1GetUserFavoritesRequest) (*PlayQueue1GetUserFavoritesResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserFavorites", &request, response); err != nil {
+	var response PlayQueue1GetUserFavoritesResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetUserFavorites", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1GetQueueIndexRequest describes the request for PlayQueue1.GetQueueIndex API
@@ -1202,13 +1186,13 @@ type PlayQueue1GetQueueIndexResponse struct {
 	CurrentPage  soap.Ui4
 }
 
-func (client *PlayQueue1) GetQueueIndex(request PlayQueue1GetQueueIndexRequest) (response *PlayQueue1GetQueueIndexResponse, err error) {
+func (client *PlayQueue1) GetQueueIndex(request PlayQueue1GetQueueIndexRequest) (*PlayQueue1GetQueueIndexResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueIndex", &request, response); err != nil {
+	var response PlayQueue1GetQueueIndexResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetQueueIndex", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1SetSpotifyPresetRequest describes the request for PlayQueue1.SetSpotifyPreset API
@@ -1221,17 +1205,13 @@ type PlayQueue1SetSpotifyPresetResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) SetSpotifyPreset(request PlayQueue1SetSpotifyPresetRequest) (response *PlayQueue1SetSpotifyPresetResponse, err error) {
+func (client *PlayQueue1) SetSpotifyPreset(request PlayQueue1SetSpotifyPresetRequest) (*PlayQueue1SetSpotifyPresetResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetSpotifyPreset", &request, response); err != nil {
+	var response PlayQueue1SetSpotifyPresetResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "SetSpotifyPreset", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// PlayQueue1BrowseSpotifyListRequest describes the request for PlayQueue1.BrowseSpotifyList API
-type PlayQueue1BrowseSpotifyListRequest struct {
+	return &response, nil
 }
 
 // PlayQueue1BrowseSpotifyListResponse describes the response for PlayQueue1.BrowseSpotifyList API
@@ -1239,17 +1219,13 @@ type PlayQueue1BrowseSpotifyListResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) BrowseSpotifyList(request PlayQueue1BrowseSpotifyListRequest) (response *PlayQueue1BrowseSpotifyListResponse, err error) {
+func (client *PlayQueue1) BrowseSpotifyList() (*PlayQueue1BrowseSpotifyListResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "BrowseSpotifyList", nil, response); err != nil {
+	var response PlayQueue1BrowseSpotifyListResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "BrowseSpotifyList", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// PlayQueue1AddSpotifyListRequest describes the request for PlayQueue1.AddSpotifyList API
-type PlayQueue1AddSpotifyListRequest struct {
+	return &response, nil
 }
 
 // PlayQueue1AddSpotifyListResponse describes the response for PlayQueue1.AddSpotifyList API
@@ -1257,13 +1233,13 @@ type PlayQueue1AddSpotifyListResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) AddSpotifyList(request PlayQueue1AddSpotifyListRequest) (response *PlayQueue1AddSpotifyListResponse, err error) {
+func (client *PlayQueue1) AddSpotifyList() (*PlayQueue1AddSpotifyListResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "AddSpotifyList", nil, response); err != nil {
+	var response PlayQueue1AddSpotifyListResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "AddSpotifyList", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1DeleteSpotifyListRequest describes the request for PlayQueue1.DeleteSpotifyList API
@@ -1276,17 +1252,13 @@ type PlayQueue1DeleteSpotifyListResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) DeleteSpotifyList(request PlayQueue1DeleteSpotifyListRequest) (response *PlayQueue1DeleteSpotifyListResponse, err error) {
+func (client *PlayQueue1) DeleteSpotifyList(request PlayQueue1DeleteSpotifyListRequest) (*PlayQueue1DeleteSpotifyListResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteSpotifyList", &request, response); err != nil {
+	var response PlayQueue1DeleteSpotifyListResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteSpotifyList", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// PlayQueue1GetSpotifyPresetMaptoKeyRequest describes the request for PlayQueue1.GetSpotifyPresetMaptoKey API
-type PlayQueue1GetSpotifyPresetMaptoKeyRequest struct {
+	return &response, nil
 }
 
 // PlayQueue1GetSpotifyPresetMaptoKeyResponse describes the response for PlayQueue1.GetSpotifyPresetMaptoKey API
@@ -1294,13 +1266,13 @@ type PlayQueue1GetSpotifyPresetMaptoKeyResponse struct {
 	Result soap.String
 }
 
-func (client *PlayQueue1) GetSpotifyPresetMaptoKey(request PlayQueue1GetSpotifyPresetMaptoKeyRequest) (response *PlayQueue1GetSpotifyPresetMaptoKeyResponse, err error) {
+func (client *PlayQueue1) GetSpotifyPresetMaptoKey() (*PlayQueue1GetSpotifyPresetMaptoKeyResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetSpotifyPresetMaptoKey", nil, response); err != nil {
+	var response PlayQueue1GetSpotifyPresetMaptoKeyResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "GetSpotifyPresetMaptoKey", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // PlayQueue1DeleteActionQueueRequest describes the request for PlayQueue1.DeleteActionQueue API
@@ -1312,13 +1284,13 @@ type PlayQueue1DeleteActionQueueRequest struct {
 type PlayQueue1DeleteActionQueueResponse struct {
 }
 
-func (client *PlayQueue1) DeleteActionQueue(request PlayQueue1DeleteActionQueueRequest) (response *PlayQueue1DeleteActionQueueResponse, err error) {
+func (client *PlayQueue1) DeleteActionQueue(request PlayQueue1DeleteActionQueueRequest) (*PlayQueue1DeleteActionQueueResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteActionQueue", &request, nil); err != nil {
+	var response PlayQueue1DeleteActionQueueResponse
+	if err := client.SOAPClient.PerformAction(URN_PlayQueue_1, "DeleteActionQueue", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1 is a client for UPnP SOAP service with URN "urn:schemas-tencent-com:service:QPlay:1".
@@ -1393,13 +1365,13 @@ type QPlay1InsertTracksResponse struct {
 	NumberOfSuccess soap.String
 }
 
-func (client *QPlay1) InsertTracks(request QPlay1InsertTracksRequest) (response *QPlay1InsertTracksResponse, err error) {
+func (client *QPlay1) InsertTracks(request QPlay1InsertTracksRequest) (*QPlay1InsertTracksResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "InsertTracks", &request, response); err != nil {
+	var response QPlay1InsertTracksResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "InsertTracks", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1RemoveTracksRequest describes the request for QPlay1.RemoveTracks API
@@ -1414,13 +1386,13 @@ type QPlay1RemoveTracksResponse struct {
 	NumberOfSuccess soap.String
 }
 
-func (client *QPlay1) RemoveTracks(request QPlay1RemoveTracksRequest) (response *QPlay1RemoveTracksResponse, err error) {
+func (client *QPlay1) RemoveTracks(request QPlay1RemoveTracksRequest) (*QPlay1RemoveTracksResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "RemoveTracks", &request, response); err != nil {
+	var response QPlay1RemoveTracksResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "RemoveTracks", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1RemoveAllTracksRequest describes the request for QPlay1.RemoveAllTracks API
@@ -1433,13 +1405,13 @@ type QPlay1RemoveAllTracksResponse struct {
 	NumberOfSuccess soap.String
 }
 
-func (client *QPlay1) RemoveAllTracks(request QPlay1RemoveAllTracksRequest) (response *QPlay1RemoveAllTracksResponse, err error) {
+func (client *QPlay1) RemoveAllTracks(request QPlay1RemoveAllTracksRequest) (*QPlay1RemoveAllTracksResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "RemoveAllTracks", &request, response); err != nil {
+	var response QPlay1RemoveAllTracksResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "RemoveAllTracks", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1GetTracksInfoRequest describes the request for QPlay1.GetTracksInfo API
@@ -1453,13 +1425,13 @@ type QPlay1GetTracksInfoResponse struct {
 	TracksMetaData soap.String
 }
 
-func (client *QPlay1) GetTracksInfo(request QPlay1GetTracksInfoRequest) (response *QPlay1GetTracksInfoResponse, err error) {
+func (client *QPlay1) GetTracksInfo(request QPlay1GetTracksInfoRequest) (*QPlay1GetTracksInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "GetTracksInfo", &request, response); err != nil {
+	var response QPlay1GetTracksInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "GetTracksInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1SetTracksInfoRequest describes the request for QPlay1.SetTracksInfo API
@@ -1475,17 +1447,13 @@ type QPlay1SetTracksInfoResponse struct {
 	NumberOfTracks soap.String
 }
 
-func (client *QPlay1) SetTracksInfo(request QPlay1SetTracksInfoRequest) (response *QPlay1SetTracksInfoResponse, err error) {
+func (client *QPlay1) SetTracksInfo(request QPlay1SetTracksInfoRequest) (*QPlay1SetTracksInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "SetTracksInfo", &request, response); err != nil {
+	var response QPlay1SetTracksInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "SetTracksInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// QPlay1GetTracksCountRequest describes the request for QPlay1.GetTracksCount API
-type QPlay1GetTracksCountRequest struct {
+	return &response, nil
 }
 
 // QPlay1GetTracksCountResponse describes the response for QPlay1.GetTracksCount API
@@ -1493,17 +1461,13 @@ type QPlay1GetTracksCountResponse struct {
 	NrTracks soap.String
 }
 
-func (client *QPlay1) GetTracksCount(request QPlay1GetTracksCountRequest) (response *QPlay1GetTracksCountResponse, err error) {
+func (client *QPlay1) GetTracksCount() (*QPlay1GetTracksCountResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "GetTracksCount", nil, response); err != nil {
+	var response QPlay1GetTracksCountResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "GetTracksCount", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
-}
-
-// QPlay1GetMaxTracksRequest describes the request for QPlay1.GetMaxTracks API
-type QPlay1GetMaxTracksRequest struct {
+	return &response, nil
 }
 
 // QPlay1GetMaxTracksResponse describes the response for QPlay1.GetMaxTracks API
@@ -1511,13 +1475,13 @@ type QPlay1GetMaxTracksResponse struct {
 	MaxTracks soap.String
 }
 
-func (client *QPlay1) GetMaxTracks(request QPlay1GetMaxTracksRequest) (response *QPlay1GetMaxTracksResponse, err error) {
+func (client *QPlay1) GetMaxTracks() (*QPlay1GetMaxTracksResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "GetMaxTracks", nil, response); err != nil {
+	var response QPlay1GetMaxTracksResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "GetMaxTracks", nil, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1QPlayAuthRequest describes the request for QPlay1.QPlayAuth API
@@ -1532,13 +1496,13 @@ type QPlay1QPlayAuthResponse struct {
 	DID  soap.String
 }
 
-func (client *QPlay1) QPlayAuth(request QPlay1QPlayAuthRequest) (response *QPlay1QPlayAuthResponse, err error) {
+func (client *QPlay1) QPlayAuth(request QPlay1QPlayAuthRequest) (*QPlay1QPlayAuthResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "QPlayAuth", &request, response); err != nil {
+	var response QPlay1QPlayAuthResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "QPlayAuth", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // QPlay1SetNetworkRequest describes the request for QPlay1.SetNetwork API
@@ -1559,13 +1523,13 @@ type QPlay1SetNetworkResponse struct {
 // Arguments:
 //
 //  QPlay1SetNetworkRequest
-func (client *QPlay1) SetNetwork(request QPlay1SetNetworkRequest) (response *QPlay1SetNetworkResponse, err error) {
+func (client *QPlay1) SetNetwork(request QPlay1SetNetworkRequest) (*QPlay1SetNetworkResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_QPlay_1, "SetNetwork", &request, nil); err != nil {
+	var response QPlay1SetNetworkResponse
+	if err := client.SOAPClient.PerformAction(URN_QPlay_1, "SetNetwork", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1 is a client for UPnP SOAP service with URN "urn:schemas-upnp-org:service:RenderingControl:1".
@@ -1638,13 +1602,13 @@ type RenderingControl1GetCurrentTransportActionsResponse struct {
 	Actions soap.String
 }
 
-func (client *RenderingControl1) GetCurrentTransportActions(request RenderingControl1GetCurrentTransportActionsRequest) (response *RenderingControl1GetCurrentTransportActionsResponse, err error) {
+func (client *RenderingControl1) GetCurrentTransportActions(request RenderingControl1GetCurrentTransportActionsRequest) (*RenderingControl1GetCurrentTransportActionsResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetCurrentTransportActions", &request, response); err != nil {
+	var response RenderingControl1GetCurrentTransportActionsResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetCurrentTransportActions", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetDeviceCapabilitiesRequest describes the request for RenderingControl1.GetDeviceCapabilities API
@@ -1666,13 +1630,13 @@ type RenderingControl1GetDeviceCapabilitiesResponse struct {
 // Return value:
 //
 //  RenderingControl1GetDeviceCapabilitiesResponse
-func (client *RenderingControl1) GetDeviceCapabilities(request RenderingControl1GetDeviceCapabilitiesRequest) (response *RenderingControl1GetDeviceCapabilitiesResponse, err error) {
+func (client *RenderingControl1) GetDeviceCapabilities(request RenderingControl1GetDeviceCapabilitiesRequest) (*RenderingControl1GetDeviceCapabilitiesResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetDeviceCapabilities", &request, response); err != nil {
+	var response RenderingControl1GetDeviceCapabilitiesResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetDeviceCapabilities", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetMediaInfoRequest describes the request for RenderingControl1.GetMediaInfo API
@@ -1702,13 +1666,13 @@ type RenderingControl1GetMediaInfoResponse struct {
 // Return value:
 //
 //  RenderingControl1GetMediaInfoResponse
-func (client *RenderingControl1) GetMediaInfo(request RenderingControl1GetMediaInfoRequest) (response *RenderingControl1GetMediaInfoResponse, err error) {
+func (client *RenderingControl1) GetMediaInfo(request RenderingControl1GetMediaInfoRequest) (*RenderingControl1GetMediaInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetMediaInfo", &request, response); err != nil {
+	var response RenderingControl1GetMediaInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetMediaInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetPositionInfoRequest describes the request for RenderingControl1.GetPositionInfo API
@@ -1733,13 +1697,13 @@ type RenderingControl1GetPositionInfoResponse struct {
 // Return value:
 //
 //  RenderingControl1GetPositionInfoResponse
-func (client *RenderingControl1) GetPositionInfo(request RenderingControl1GetPositionInfoRequest) (response *RenderingControl1GetPositionInfoResponse, err error) {
+func (client *RenderingControl1) GetPositionInfo(request RenderingControl1GetPositionInfoRequest) (*RenderingControl1GetPositionInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetPositionInfo", &request, response); err != nil {
+	var response RenderingControl1GetPositionInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetPositionInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetTransportInfoRequest describes the request for RenderingControl1.GetTransportInfo API
@@ -1761,13 +1725,13 @@ type RenderingControl1GetTransportInfoResponse struct {
 // Return value:
 //
 //  RenderingControl1GetTransportInfoResponse
-func (client *RenderingControl1) GetTransportInfo(request RenderingControl1GetTransportInfoRequest) (response *RenderingControl1GetTransportInfoResponse, err error) {
+func (client *RenderingControl1) GetTransportInfo(request RenderingControl1GetTransportInfoRequest) (*RenderingControl1GetTransportInfoResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetTransportInfo", &request, response); err != nil {
+	var response RenderingControl1GetTransportInfoResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetTransportInfo", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetTransportSettingsRequest describes the request for RenderingControl1.GetTransportSettings API
@@ -1787,13 +1751,13 @@ type RenderingControl1GetTransportSettingsResponse struct {
 // Return value:
 //
 //  RenderingControl1GetTransportSettingsResponse
-func (client *RenderingControl1) GetTransportSettings(request RenderingControl1GetTransportSettingsRequest) (response *RenderingControl1GetTransportSettingsResponse, err error) {
+func (client *RenderingControl1) GetTransportSettings(request RenderingControl1GetTransportSettingsRequest) (*RenderingControl1GetTransportSettingsResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetTransportSettings", &request, response); err != nil {
+	var response RenderingControl1GetTransportSettingsResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetTransportSettings", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1NextRequest describes the request for RenderingControl1.Next API
@@ -1805,13 +1769,13 @@ type RenderingControl1NextRequest struct {
 type RenderingControl1NextResponse struct {
 }
 
-func (client *RenderingControl1) Next(request RenderingControl1NextRequest) (response *RenderingControl1NextResponse, err error) {
+func (client *RenderingControl1) Next(request RenderingControl1NextRequest) (*RenderingControl1NextResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Next", &request, nil); err != nil {
+	var response RenderingControl1NextResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Next", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1PauseRequest describes the request for RenderingControl1.Pause API
@@ -1823,13 +1787,13 @@ type RenderingControl1PauseRequest struct {
 type RenderingControl1PauseResponse struct {
 }
 
-func (client *RenderingControl1) Pause(request RenderingControl1PauseRequest) (response *RenderingControl1PauseResponse, err error) {
+func (client *RenderingControl1) Pause(request RenderingControl1PauseRequest) (*RenderingControl1PauseResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Pause", &request, nil); err != nil {
+	var response RenderingControl1PauseResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Pause", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1PlayRequest describes the request for RenderingControl1.Play API
@@ -1847,13 +1811,13 @@ type RenderingControl1PlayResponse struct {
 // Arguments:
 //
 //  RenderingControl1PlayRequest
-func (client *RenderingControl1) Play(request RenderingControl1PlayRequest) (response *RenderingControl1PlayResponse, err error) {
+func (client *RenderingControl1) Play(request RenderingControl1PlayRequest) (*RenderingControl1PlayResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Play", &request, nil); err != nil {
+	var response RenderingControl1PlayResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Play", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1PreviousRequest describes the request for RenderingControl1.Previous API
@@ -1865,13 +1829,13 @@ type RenderingControl1PreviousRequest struct {
 type RenderingControl1PreviousResponse struct {
 }
 
-func (client *RenderingControl1) Previous(request RenderingControl1PreviousRequest) (response *RenderingControl1PreviousResponse, err error) {
+func (client *RenderingControl1) Previous(request RenderingControl1PreviousRequest) (*RenderingControl1PreviousResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Previous", &request, nil); err != nil {
+	var response RenderingControl1PreviousResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Previous", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1SeekRequest describes the request for RenderingControl1.Seek API
@@ -1890,13 +1854,13 @@ type RenderingControl1SeekResponse struct {
 // Arguments:
 //
 //  RenderingControl1SeekRequest
-func (client *RenderingControl1) Seek(request RenderingControl1SeekRequest) (response *RenderingControl1SeekResponse, err error) {
+func (client *RenderingControl1) Seek(request RenderingControl1SeekRequest) (*RenderingControl1SeekResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Seek", &request, nil); err != nil {
+	var response RenderingControl1SeekResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Seek", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1SetAVTransportURIRequest describes the request for RenderingControl1.SetAVTransportURI API
@@ -1910,13 +1874,13 @@ type RenderingControl1SetAVTransportURIRequest struct {
 type RenderingControl1SetAVTransportURIResponse struct {
 }
 
-func (client *RenderingControl1) SetAVTransportURI(request RenderingControl1SetAVTransportURIRequest) (response *RenderingControl1SetAVTransportURIResponse, err error) {
+func (client *RenderingControl1) SetAVTransportURI(request RenderingControl1SetAVTransportURIRequest) (*RenderingControl1SetAVTransportURIResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "SetAVTransportURI", &request, nil); err != nil {
+	var response RenderingControl1SetAVTransportURIResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "SetAVTransportURI", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1StopRequest describes the request for RenderingControl1.Stop API
@@ -1928,13 +1892,13 @@ type RenderingControl1StopRequest struct {
 type RenderingControl1StopResponse struct {
 }
 
-func (client *RenderingControl1) Stop(request RenderingControl1StopRequest) (response *RenderingControl1StopResponse, err error) {
+func (client *RenderingControl1) Stop(request RenderingControl1StopRequest) (*RenderingControl1StopResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "Stop", &request, nil); err != nil {
+	var response RenderingControl1StopResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "Stop", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetPlayTypeRequest describes the request for RenderingControl1.GetPlayType API
@@ -1947,13 +1911,13 @@ type RenderingControl1GetPlayTypeResponse struct {
 	PlayType soap.String
 }
 
-func (client *RenderingControl1) GetPlayType(request RenderingControl1GetPlayTypeRequest) (response *RenderingControl1GetPlayTypeResponse, err error) {
+func (client *RenderingControl1) GetPlayType(request RenderingControl1GetPlayTypeRequest) (*RenderingControl1GetPlayTypeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetPlayType", &request, response); err != nil {
+	var response RenderingControl1GetPlayTypeResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetPlayType", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1GetInfoExRequest describes the request for RenderingControl1.GetInfoEx API
@@ -2000,13 +1964,13 @@ type RenderingControl1GetInfoExResponse struct {
 // Return value:
 //
 //  RenderingControl1GetInfoExResponse
-func (client *RenderingControl1) GetInfoEx(request RenderingControl1GetInfoExRequest) (response *RenderingControl1GetInfoExResponse, err error) {
+func (client *RenderingControl1) GetInfoEx(request RenderingControl1GetInfoExRequest) (*RenderingControl1GetInfoExResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetInfoEx", &request, response); err != nil {
+	var response RenderingControl1GetInfoExResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "GetInfoEx", &request, &response); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1SetPlayModeRequest describes the request for RenderingControl1.SetPlayMode API
@@ -2024,13 +1988,13 @@ type RenderingControl1SetPlayModeResponse struct {
 // Arguments:
 //
 //  RenderingControl1SetPlayModeRequest
-func (client *RenderingControl1) SetPlayMode(request RenderingControl1SetPlayModeRequest) (response *RenderingControl1SetPlayModeResponse, err error) {
+func (client *RenderingControl1) SetPlayMode(request RenderingControl1SetPlayModeRequest) (*RenderingControl1SetPlayModeResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "SetPlayMode", &request, nil); err != nil {
+	var response RenderingControl1SetPlayModeResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "SetPlayMode", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1SeekForwardRequest describes the request for RenderingControl1.SeekForward API
@@ -2042,13 +2006,13 @@ type RenderingControl1SeekForwardRequest struct {
 type RenderingControl1SeekForwardResponse struct {
 }
 
-func (client *RenderingControl1) SeekForward(request RenderingControl1SeekForwardRequest) (response *RenderingControl1SeekForwardResponse, err error) {
+func (client *RenderingControl1) SeekForward(request RenderingControl1SeekForwardRequest) (*RenderingControl1SeekForwardResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "SeekForward", &request, nil); err != nil {
+	var response RenderingControl1SeekForwardResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "SeekForward", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }
 
 // RenderingControl1SeekBackwardRequest describes the request for RenderingControl1.SeekBackward API
@@ -2060,11 +2024,11 @@ type RenderingControl1SeekBackwardRequest struct {
 type RenderingControl1SeekBackwardResponse struct {
 }
 
-func (client *RenderingControl1) SeekBackward(request RenderingControl1SeekBackwardRequest) (response *RenderingControl1SeekBackwardResponse, err error) {
+func (client *RenderingControl1) SeekBackward(request RenderingControl1SeekBackwardRequest) (*RenderingControl1SeekBackwardResponse, error) {
 	// Perform the SOAP call.
-	if err = client.SOAPClient.PerformAction(URN_RenderingControl_1, "SeekBackward", &request, nil); err != nil {
+	var response RenderingControl1SeekBackwardResponse
+	if err := client.SOAPClient.PerformAction(URN_RenderingControl_1, "SeekBackward", &request, nil); err != nil {
 		return nil, errors.Wrap(err, "performing SOAP request")
 	}
-
-	return response, nil
+	return &response, nil
 }

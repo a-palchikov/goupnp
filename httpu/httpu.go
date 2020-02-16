@@ -5,16 +5,18 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // HTTPUClient is a client for dealing with HTTPU (HTTP over UDP). Its typical
 // function is for HTTPMU, and particularly SSDP.
 type HTTPUClient struct {
+	log.FieldLogger
 	connLock sync.Mutex // Protects use of conn.
 	conn     net.PacketConn
 }
@@ -40,7 +42,10 @@ func NewHTTPUClientAddr(addr string) (*HTTPUClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &HTTPUClient{conn: conn}, nil
+	return &HTTPUClient{
+		FieldLogger: log.WithField("component", "httpu"),
+		conn:        conn,
+	}, nil
 }
 
 // Close shuts down the client. The client will no longer be useful following
@@ -122,7 +127,7 @@ func (httpu *HTTPUClient) Do(req *http.Request, timeout time.Duration, numSends 
 		// Parse response.
 		response, err := http.ReadResponse(bufio.NewReader(bytes.NewBuffer(responseBytes[:n])), req)
 		if err != nil {
-			log.Printf("httpu: error while parsing response: %v", err)
+			httpu.WithError(err).Warn("Failed to parse response.")
 			continue
 		}
 

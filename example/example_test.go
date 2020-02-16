@@ -15,9 +15,9 @@ import (
 // nolint:govet
 func Example_WANPPPConnection1_GetExternalIPAddress() {
 	clients, errors, err := internetgateway1.NewWANPPPConnection1Clients()
-	extIPClients := make([]GetExternalIPAddresser, len(clients))
+	extIPClients := make([]getExternalIPAddresser, len(clients))
 	for i, client := range clients {
-		extIPClients[i] = client
+		extIPClients[i] = wanPPPConnectionClient{client: client}
 	}
 	DisplayExternalIPResults(extIPClients, errors, err)
 	// Output:
@@ -28,20 +28,50 @@ func Example_WANPPPConnection1_GetExternalIPAddress() {
 // nolint:govet
 func Example_WANIPConnection_GetExternalIPAddress() {
 	clients, errors, err := internetgateway1.NewWANIPConnection1Clients()
-	extIPClients := make([]GetExternalIPAddresser, len(clients))
+	extIPClients := make([]getExternalIPAddresser, len(clients))
 	for i, client := range clients {
-		extIPClients[i] = client
+		extIPClients[i] = wanIPConnectionClient{client: client}
 	}
 	DisplayExternalIPResults(extIPClients, errors, err)
 	// Output:
 }
 
-type GetExternalIPAddresser interface {
+func (r wanIPConnectionClient) GetExternalIPAddress() (externalIPAddress string, err error) {
+	resp, err := r.client.GetExternalIPAddress()
+	if err != nil {
+		return "", err
+	}
+	return string(resp.NewExternalIPAddress), nil
+}
+func (r wanIPConnectionClient) GetServiceClient() *goupnp.ServiceClient {
+	return r.client.GetServiceClient()
+}
+
+type wanIPConnectionClient struct {
+	client *internetgateway1.WANIPConnection1
+}
+
+func (r wanPPPConnectionClient) GetExternalIPAddress() (externalIPAddress string, err error) {
+	resp, err := r.client.GetExternalIPAddress()
+	if err != nil {
+		return "", err
+	}
+	return string(resp.NewExternalIPAddress), nil
+}
+func (r wanPPPConnectionClient) GetServiceClient() *goupnp.ServiceClient {
+	return r.client.GetServiceClient()
+}
+
+type wanPPPConnectionClient struct {
+	client *internetgateway1.WANPPPConnection1
+}
+
+type getExternalIPAddresser interface {
 	GetExternalIPAddress() (NewExternalIPAddress string, err error)
 	GetServiceClient() *goupnp.ServiceClient
 }
 
-func DisplayExternalIPResults(clients []GetExternalIPAddresser, errors []error, err error) {
+func DisplayExternalIPResults(clients []getExternalIPAddresser, errors []error, err error) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error discovering service with UPnP: ", err)
 		return

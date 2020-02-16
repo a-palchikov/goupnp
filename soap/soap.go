@@ -77,7 +77,7 @@ func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAc
 	responseEnv := newSOAPEnvelope()
 	decoder := xml.NewDecoder(response.Body)
 	if err := decoder.Decode(responseEnv); err != nil {
-		return errors.Wrapf(err, "goupnp: error decoding response body: %v")
+		return errors.Wrap(err, "goupnp: error decoding response body")
 	}
 
 	log.WithField("resp", responseEnv).Info("Recv response.")
@@ -160,10 +160,10 @@ func encodeRequestArgs(w *bytes.Buffer, inAction interface{}) error {
 			text = escapeXMLText(text)
 		}
 		if _, err := w.Write([]byte(text)); err != nil {
-			return errors.Wrapf(err, "goupnp: error writing value for SOAP arg %q: %v", argName)
+			return errors.Wrapf(err, "goupnp: error writing value for SOAP arg %q", argName)
 		}
 		if err := enc.EncodeToken(elem.End()); err != nil {
-			return errors.Wrapf(err, "goupnp: error encoding end element for SOAP arg %q: %v", argName)
+			return errors.Wrapf(err, "goupnp: error encoding end element for SOAP arg %q", argName)
 		}
 	}
 	enc.Flush()

@@ -2,496 +2,228 @@ package soap
 
 import (
 	"bytes"
-	"math"
+	"encoding"
 	"net/url"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
 
 type convTest interface {
-	Marshal() (string, error)
-	Unmarshal(string) (interface{}, error)
-	Equal(result interface{}) bool
-}
-
-// duper is an interface that convTest values may optionally also implement to
-// generate another convTest for a value in an otherwise identical testCase.
-type duper interface {
-	Dupe(tag string) []convTest
+	encoding.TextMarshaler
+	encoding.TextUnmarshaler
 }
 
 type testCase struct {
-	value            convTest
-	str              string
-	wantMarshalErr   bool
-	wantUnmarshalErr bool
-	noMarshal        bool
-	noUnMarshal      bool
-	tag              string
+	// value specifies the value for the Marshal test
+	value convTest
+	// str specifies the input string for Unmashal test
+	str string
+	// expected specifies the expected value
+	expected convTest
+	// err optionally specifies the expected error
+	err string
 }
 
-type Ui1Test uint8
-
-func (v Ui1Test) Marshal() (string, error) {
-	return MarshalUi1(uint8(v))
-}
-func (v Ui1Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalUi1(s)
-}
-func (v Ui1Test) Equal(result interface{}) bool {
-	return uint8(v) == result.(uint8)
-}
-func (v Ui1Test) Dupe(tag string) []convTest {
-	if tag == "dupe" {
-		return []convTest{
-			Ui2Test(v),
-			Ui4Test(v),
-		}
-	}
-	return nil
-}
-
-type Ui2Test uint16
-
-func (v Ui2Test) Marshal() (string, error) {
-	return MarshalUi2(uint16(v))
-}
-func (v Ui2Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalUi2(s)
-}
-func (v Ui2Test) Equal(result interface{}) bool {
-	return uint16(v) == result.(uint16)
-}
-
-type Ui4Test uint32
-
-func (v Ui4Test) Marshal() (string, error) {
-	return MarshalUi4(uint32(v))
-}
-func (v Ui4Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalUi4(s)
-}
-func (v Ui4Test) Equal(result interface{}) bool {
-	return uint32(v) == result.(uint32)
-}
-
-type I1Test int8
-
-func (v I1Test) Marshal() (string, error) {
-	return MarshalI1(int8(v))
-}
-func (v I1Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalI1(s)
-}
-func (v I1Test) Equal(result interface{}) bool {
-	return int8(v) == result.(int8)
-}
-func (v I1Test) Dupe(tag string) []convTest {
-	if tag == "dupe" {
-		return []convTest{
-			I2Test(v),
-			I4Test(v),
-		}
-	}
-	return nil
-}
-
-type I2Test int16
-
-func (v I2Test) Marshal() (string, error) {
-	return MarshalI2(int16(v))
-}
-func (v I2Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalI2(s)
-}
-func (v I2Test) Equal(result interface{}) bool {
-	return int16(v) == result.(int16)
-}
-
-type I4Test int32
-
-func (v I4Test) Marshal() (string, error) {
-	return MarshalI4(int32(v))
-}
-func (v I4Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalI4(s)
-}
-func (v I4Test) Equal(result interface{}) bool {
-	return int32(v) == result.(int32)
-}
-
-type IntTest int64
-
-func (v IntTest) Marshal() (string, error) {
-	return MarshalInt(int64(v))
-}
-func (v IntTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalInt(s)
-}
-func (v IntTest) Equal(result interface{}) bool {
-	return int64(v) == result.(int64)
-}
-
-type Fixed14_4Test float64
-
-func (v Fixed14_4Test) Marshal() (string, error) {
-	return MarshalFixed14_4(float64(v))
-}
-func (v Fixed14_4Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalFixed14_4(s)
-}
-func (v Fixed14_4Test) Equal(result interface{}) bool {
-	return math.Abs(float64(v)-result.(float64)) < 0.001
-}
-
-type CharTest rune
-
-func (v CharTest) Marshal() (string, error) {
-	return MarshalChar(rune(v))
-}
-func (v CharTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalChar(s)
-}
-func (v CharTest) Equal(result interface{}) bool {
-	return rune(v) == result.(rune)
-}
-
-type DateTest struct{ time.Time }
-
-func (v DateTest) Marshal() (string, error) {
-	return MarshalDate(time.Time(v.Time))
-}
-func (v DateTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalDate(s)
-}
-func (v DateTest) Equal(result interface{}) bool {
-	return v.Time.Equal(result.(time.Time))
-}
-func (v DateTest) Dupe(tag string) []convTest {
-	if tag != "no:dateTime" {
-		return []convTest{DateTimeTest(v)}
-	}
-	return nil
-}
-
-type TimeOfDayTest struct {
-	TimeOfDay
-}
-
-func (v TimeOfDayTest) Marshal() (string, error) {
-	return MarshalTimeOfDay(v.TimeOfDay)
-}
-func (v TimeOfDayTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalTimeOfDay(s)
-}
-func (v TimeOfDayTest) Equal(result interface{}) bool {
-	return v.TimeOfDay == result.(TimeOfDay)
-}
-func (v TimeOfDayTest) Dupe(tag string) []convTest {
-	if tag != "no:time.tz" {
-		return []convTest{TimeOfDayTzTest(v)}
-	}
-	return nil
-}
-
-type TimeOfDayTzTest struct {
-	TimeOfDay
-}
-
-func (v TimeOfDayTzTest) Marshal() (string, error) {
-	return MarshalTimeOfDayTz(v.TimeOfDay)
-}
-func (v TimeOfDayTzTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalTimeOfDayTz(s)
-}
-func (v TimeOfDayTzTest) Equal(result interface{}) bool {
-	return v.TimeOfDay == result.(TimeOfDay)
-}
-
-type DateTimeTest struct{ time.Time }
-
-func (v DateTimeTest) Marshal() (string, error) {
-	return MarshalDateTime(time.Time(v.Time))
-}
-func (v DateTimeTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalDateTime(s)
-}
-func (v DateTimeTest) Equal(result interface{}) bool {
-	return v.Time.Equal(result.(time.Time))
-}
-func (v DateTimeTest) Dupe(tag string) []convTest {
-	if tag != "no:dateTime.tz" {
-		return []convTest{DateTimeTzTest(v)}
-	}
-	return nil
-}
-
-type DateTimeTzTest struct{ time.Time }
-
-func (v DateTimeTzTest) Marshal() (string, error) {
-	return MarshalDateTimeTz(time.Time(v.Time))
-}
-func (v DateTimeTzTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalDateTimeTz(s)
-}
-func (v DateTimeTzTest) Equal(result interface{}) bool {
-	return v.Time.Equal(result.(time.Time))
-}
-
-type BooleanTest bool
-
-func (v BooleanTest) Marshal() (string, error) {
-	return MarshalBoolean(bool(v))
-}
-func (v BooleanTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalBoolean(s)
-}
-func (v BooleanTest) Equal(result interface{}) bool {
-	return bool(v) == result.(bool)
-}
-
-type BinBase64Test []byte
-
-func (v BinBase64Test) Marshal() (string, error) {
-	return MarshalBinBase64([]byte(v))
-}
-func (v BinBase64Test) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalBinBase64(s)
-}
-func (v BinBase64Test) Equal(result interface{}) bool {
-	return bytes.Equal([]byte(v), result.([]byte))
-}
-
-type BinHexTest []byte
-
-func (v BinHexTest) Marshal() (string, error) {
-	return MarshalBinHex([]byte(v))
-}
-func (v BinHexTest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalBinHex(s)
-}
-func (v BinHexTest) Equal(result interface{}) bool {
-	return bytes.Equal([]byte(v), result.([]byte))
-}
-
-type URITest struct{ URL *url.URL }
-
-func (v URITest) Marshal() (string, error) {
-	return MarshalURI(v.URL)
-}
-func (v URITest) Unmarshal(s string) (interface{}, error) {
-	return UnmarshalURI(s)
-}
-func (v URITest) Equal(result interface{}) bool {
-	return v.URL.String() == result.(*url.URL).String()
-}
-
-func Test(t *testing.T) {
+func TestSerdeTypes(t *testing.T) {
 	const time010203 time.Duration = (1*3600 + 2*60 + 3) * time.Second
 	const time0102 time.Duration = (1*3600 + 2*60) * time.Second
 	const time01 time.Duration = (1 * 3600) * time.Second
 	const time235959 time.Duration = (23*3600 + 59*60 + 59) * time.Second
 
-	// Fake out the local time for the implementation.
-	localLoc = time.FixedZone("Fake/Local", 6*3600)
-	defer func() {
-		localLoc = time.Local
-	}()
-
-	tests := []testCase{
-		// ui1
-		{str: "", value: Ui1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: " ", value: Ui1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: "abc", value: Ui1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: "-1", value: Ui1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: "0", value: Ui1Test(0), tag: "dupe"},
-		{str: "1", value: Ui1Test(1), tag: "dupe"},
-		{str: "255", value: Ui1Test(255), tag: "dupe"},
-		{str: "256", value: Ui1Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+	var testCases = []testCase{
+		{str: "", expected: ui1(0), err: `parsing "": invalid syntax`},       // d
+		{str: " ", expected: ui1(0), err: `parsing " ": invalid syntax`},     // d
+		{str: "abc", expected: ui1(0), err: `parsing "abc": invalid syntax`}, // d
+		{str: "-1", expected: ui1(0), err: `parsing "-1": invalid syntax`},   // d
+		{str: "0", expected: ui1(0)},
+		{str: "1", expected: ui1(1)},
+		{str: "255", expected: ui1(255)},
+		{str: "255", value: ui1(255)},
+		{str: "256", expected: ui1(0), err: `parsing "256": value out of range`},
 		// ui2
-		{str: "65535", value: Ui2Test(65535)},
-		{str: "65536", value: Ui2Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "65535", expected: ui2(65535)},
+		{str: "65536", expected: ui2(0), err: `parsing "65536": value out of range`},
 		// ui4
-		{str: "4294967295", value: Ui4Test(4294967295)},
-		{str: "4294967296", value: Ui4Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "4294967295", expected: ui4(4294967295)},
+		{str: "4294967296", expected: ui4(0), err: `parsing "4294967296": value out of range`},
+		// ui8
+		{str: "18446744073709551615", expected: ui8(18446744073709551615)},
+		{str: "18446744073709551616", expected: ui8(0), err: `parsing "18446744073709551616": value out of range`},
 		// i1
-		{str: "", value: I1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: " ", value: I1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: "abc", value: I1Test(0), wantUnmarshalErr: true, noMarshal: true, tag: "dupe"},
-		{str: "0", value: I1Test(0), tag: "dupe"},
-		{str: "-1", value: I1Test(-1), tag: "dupe"},
-		{str: "127", value: I1Test(127), tag: "dupe"},
-		{str: "-128", value: I1Test(-128), tag: "dupe"},
-		{str: "128", value: I1Test(0), wantUnmarshalErr: true, noMarshal: true},
-		{str: "-129", value: I1Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "", expected: i1(0), err: `parsing "": invalid syntax`},       // d
+		{str: " ", expected: i1(0), err: `parsing " ": invalid syntax`},     // d
+		{str: "abc", expected: i1(0), err: `parsing "abc": invalid syntax`}, // d
+		{str: "0", expected: i1(0)},
+		{str: "-1", expected: i1(-1)},
+		{str: "127", expected: i1(127)},
+		{str: "-128", expected: i1(-128)},
+		{str: "128", expected: i1(0), err: `parsing "128": value out of range`},
+		{str: "-129", expected: i1(0), err: `parsing "-129": value out of range`},
 		// i2
-		{str: "32767", value: I2Test(32767)},
-		{str: "-32768", value: I2Test(-32768)},
-		{str: "32768", value: I2Test(0), wantUnmarshalErr: true, noMarshal: true},
-		{str: "-32769", value: I2Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "32767", expected: i2(32767)},
+		{str: "-32768", expected: i2(-32768)},
+		{str: "32768", expected: i2(0), err: `parsing "32768": value out of range`},
+		{str: "-32769", expected: i2(0), err: `parsing "-32769": value out of range`},
 		// i4
-		{str: "2147483647", value: I4Test(2147483647)},
-		{str: "-2147483648", value: I4Test(-2147483648)},
-		{str: "2147483648", value: I4Test(0), wantUnmarshalErr: true, noMarshal: true},
-		{str: "-2147483649", value: I4Test(0), wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "2147483647", expected: i4(2147483647)},
+		{str: "-2147483648", expected: i4(-2147483648)},
+		{str: "2147483648", expected: i4(0), err: `parsing "2147483648": value out of range`},
+		{str: "-2147483649", expected: i4(0), err: `parsing "-2147483649": value out of range`},
 		// int
-		{str: "9223372036854775807", value: IntTest(9223372036854775807)},
-		{str: "-9223372036854775808", value: IntTest(-9223372036854775808)},
-		{str: "9223372036854775808", value: IntTest(0), wantUnmarshalErr: true, noMarshal: true},
-		{str: "-9223372036854775809", value: IntTest(0), wantUnmarshalErr: true, noMarshal: true},
-
-		// fixed.14.4
-		{str: "0.0000", value: Fixed14_4Test(0)},
-		{str: "1.0000", value: Fixed14_4Test(1)},
-		{str: "1.2346", value: Fixed14_4Test(1.23456)},
-		{str: "-1.0000", value: Fixed14_4Test(-1)},
-		{str: "-1.2346", value: Fixed14_4Test(-1.23456)},
-		{str: "10000000000000.0000", value: Fixed14_4Test(1e13)},
-		{str: "100000000000000.0000", value: Fixed14_4Test(1e14), wantMarshalErr: true, wantUnmarshalErr: true},
-		{str: "-10000000000000.0000", value: Fixed14_4Test(-1e13)},
-		{str: "-100000000000000.0000", value: Fixed14_4Test(-1e14), wantMarshalErr: true, wantUnmarshalErr: true},
-
+		{str: "9223372036854775807", expected: int_(9223372036854775807)},
+		{str: "-9223372036854775808", expected: int_(-9223372036854775808)},
+		{str: "9223372036854775808", expected: int_(0), err: `parsing "9223372036854775808": value out of range`},
+		{str: "-9223372036854775809", expected: int_(0), err: `parsing "-9223372036854775809": value out of range`},
+		// fixed14_4
+		{str: "0.0000", expected: fixed14_4(0)},
+		{str: "1.0000", expected: fixed14_4(1)},
+		{str: "1.2346", expected: fixed14_4(1.23456)},
+		{str: "-1.0000", expected: fixed14_4(-1)},
+		{str: "-1.2346", expected: fixed14_4(-1.23456)},
+		{str: "10000000000000.0000", expected: fixed14_4(1e13)},
+		{str: "100000000000000.0000", expected: fixed14_4(1e14), err: `value "100000000000000.0000" out of bounds`},
+		{str: "-10000000000000.0000", expected: fixed14_4(-1e13)},
+		{str: "-100000000000000.0000", expected: fixed14_4(-1e14), err: `value "-100000000000000.0000" out of bounds`},
 		// char
-		{str: "a", value: CharTest('a')},
-		{str: "z", value: CharTest('z')},
-		{str: "\u1234", value: CharTest(0x1234)},
-		{str: "aa", value: CharTest(0), wantMarshalErr: true, wantUnmarshalErr: true},
-		{str: "", value: CharTest(0), wantMarshalErr: true, wantUnmarshalErr: true},
-
+		{str: "a", expected: char('a')},
+		{str: "z", expected: char('z')},
+		{str: "\u1234", expected: char(0x1234)},
+		{str: "aa", expected: char(0), err: `value "aa" is not a single rune`},
+		{str: "", expected: char(0), err: "got empty string"},
 		// date
-		{str: "2013-10-08", value: DateTest{time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)}, tag: "no:dateTime"},
-		{str: "20131008", value: DateTest{time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)}, noMarshal: true, tag: "no:dateTime"},
-		{str: "2013-10-08T10:30:50", value: DateTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime"},
-		{str: "2013-10-08T10:30:50Z", value: DateTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime"},
-		{str: "", value: DateTest{}, wantMarshalErr: true, wantUnmarshalErr: true, noMarshal: true},
-		{str: "-1", value: DateTest{}, wantUnmarshalErr: true, noMarshal: true},
-
+		{str: "2013-10-08", expected: date(Date(time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)))},                                               // d
+		{str: "20131008", expected: date(Date(time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)))},                                                 // d
+		{str: "2013-10-08T10:30:50", expected: date(Date{}), err: `value "2013-10-08T10:30:50" is not in a recognized ISO8601 date format`},   // d
+		{str: "2013-10-08T10:30:50Z", expected: date(Date{}), err: `value "2013-10-08T10:30:50Z" is not in a recognized ISO8601 date format`}, // d
+		{str: "", expected: date(Date{}), err: `value "" is not in a recognized ISO8601 date format`},
+		{str: "-1", expected: date(Date{}), err: `value "-1" is not in a recognized ISO8601 date format`},
 		// time
-		{str: "00:00:00", value: TimeOfDayTest{TimeOfDay{FromMidnight: 0}}},
-		{str: "000000", value: TimeOfDayTest{TimeOfDay{FromMidnight: 0}}, noMarshal: true},
-		{str: "24:00:00", value: TimeOfDayTest{TimeOfDay{FromMidnight: 24 * time.Hour}}, noMarshal: true}, // ISO8601 special case
-		{str: "24:01:00", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "24:00:01", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "25:00:00", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "00:60:00", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "00:00:60", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "01:02:03", value: TimeOfDayTest{TimeOfDay{FromMidnight: time010203}}},
-		{str: "010203", value: TimeOfDayTest{TimeOfDay{FromMidnight: time010203}}, noMarshal: true},
-		{str: "23:59:59", value: TimeOfDayTest{TimeOfDay{FromMidnight: time235959}}},
-		{str: "235959", value: TimeOfDayTest{TimeOfDay{FromMidnight: time235959}}, noMarshal: true},
-		{str: "01:02", value: TimeOfDayTest{TimeOfDay{FromMidnight: time0102}}, noMarshal: true},
-		{str: "0102", value: TimeOfDayTest{TimeOfDay{FromMidnight: time0102}}, noMarshal: true},
-		{str: "01", value: TimeOfDayTest{TimeOfDay{FromMidnight: time01}}, noMarshal: true},
-		{str: "foo 01:02:03", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "foo\n01:02:03", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03 foo", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03\nfoo", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03Z", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03+01", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03+01:23", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03+0123", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03-01", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03-01:23", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-		{str: "01:02:03-0123", value: TimeOfDayTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:time.tz"},
-
+		{str: "00:00:00", expected: timeOfDay(TimeOfDay{FromMidnight: 0})},
+		{str: "000000", expected: timeOfDay(TimeOfDay{FromMidnight: 0})},
+		{str: "24:00:00", expected: timeOfDay(TimeOfDay{FromMidnight: 24 * time.Hour})}, // ISO8601 special case
+		{str: "24:01:00", expected: timeOfDay(TimeOfDay{}), err: `value "24:01:00" has value(s) out of range`},
+		{str: "24:00:01", expected: timeOfDay(TimeOfDay{}), err: `value "24:00:01" has value(s) out of range`},
+		{str: "25:00:00", expected: timeOfDay(TimeOfDay{}), err: `value "25:00:00" has value(s) out of range`},
+		{str: "00:60:00", expected: timeOfDay(TimeOfDay{}), err: `value "00:60:00" has value(s) out of range`},
+		{str: "00:00:60", expected: timeOfDay(TimeOfDay{}), err: `value "00:00:60" has value(s) out of range`},
+		{str: "01:02:03", expected: timeOfDay(TimeOfDay{FromMidnight: time010203})},
+		{str: "010203", expected: timeOfDay(TimeOfDay{FromMidnight: time010203})},
+		{str: "23:59:59", expected: timeOfDay(TimeOfDay{FromMidnight: time235959})},
+		{str: "235959", expected: timeOfDay(TimeOfDay{FromMidnight: time235959})},
+		{str: "01:02", expected: timeOfDay(TimeOfDay{FromMidnight: time0102})},
+		{str: "0102", expected: timeOfDay(TimeOfDay{FromMidnight: time0102})},
+		{str: "01", expected: timeOfDay(TimeOfDay{FromMidnight: time01})},
+		{str: "foo 01:02:03", expected: timeOfDay(TimeOfDay{}), err: `value "foo 01:02:03" is not in ISO8601 time format`},
+		{str: "foo\n01:02:03", expected: timeOfDay(TimeOfDay{}), err: `value "foo\n01:02:03" is not in ISO8601 time format`},
+		{str: "01:02:03 foo", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03 foo" is not in ISO8601 time format`},
+		{str: "01:02:03\nfoo", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03\nfoo" is not in ISO8601 time format`},
+		{str: "01:02:03Z", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03Z" contains unexpected timezone`},
+		{str: "01:02:03+01", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03+01" contains unexpected timezone`},
+		{str: "01:02:03+01:23", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03+01:23" contains unexpected timezone`},
+		{str: "01:02:03+0123", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03+0123" contains unexpected timezone`},
+		{str: "01:02:03-01", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03-01" contains unexpected timezone`},
+		{str: "01:02:03-01:23", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03-01:23" contains unexpected timezone`},
+		{str: "01:02:03-0123", expected: timeOfDay(TimeOfDay{}), err: `value "01:02:03-0123" contains unexpected timezone`},
 		// time.tz
-		{str: "24:00:01", value: TimeOfDayTzTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "01Z", value: TimeOfDayTzTest{TimeOfDay{time01, true, 0}}, noMarshal: true},
-		{str: "01:02:03Z", value: TimeOfDayTzTest{TimeOfDay{time010203, true, 0}}},
-		{str: "01+01", value: TimeOfDayTzTest{TimeOfDay{time01, true, 3600}}, noMarshal: true},
-		{str: "01:02:03+01", value: TimeOfDayTzTest{TimeOfDay{time010203, true, 3600}}, noMarshal: true},
-		{str: "01:02:03+01:23", value: TimeOfDayTzTest{TimeOfDay{time010203, true, 3600 + 23*60}}},
-		{str: "01:02:03+0123", value: TimeOfDayTzTest{TimeOfDay{time010203, true, 3600 + 23*60}}, noMarshal: true},
-		{str: "01:02:03-01", value: TimeOfDayTzTest{TimeOfDay{time010203, true, -3600}}, noMarshal: true},
-		{str: "01:02:03-01:23", value: TimeOfDayTzTest{TimeOfDay{time010203, true, -(3600 + 23*60)}}},
-		{str: "01:02:03-0123", value: TimeOfDayTzTest{TimeOfDay{time010203, true, -(3600 + 23*60)}}, noMarshal: true},
-
+		{str: "24:00:01", expected: timeOfDayTz(TimeOfDayTz{}), err: `value "24:00:01" has value(s) out of range`},
+		{str: "01Z", expected: timeOfDayTz(TimeOfDayTz{time01, true, 0})},
+		{str: "01:02:03Z", expected: timeOfDayTz(TimeOfDayTz{time010203, true, 0})},
+		{str: "01+01", expected: timeOfDayTz(TimeOfDayTz{time01, true, 3600})},
+		{str: "01:02:03+01", expected: timeOfDayTz(TimeOfDayTz{time010203, true, 3600})},
+		{str: "01:02:03+01:23", expected: timeOfDayTz(TimeOfDayTz{time010203, true, 3600 + 23*60})},
+		{str: "01:02:03+0123", expected: timeOfDayTz(TimeOfDayTz{time010203, true, 3600 + 23*60})},
+		{str: "01:02:03-01", expected: timeOfDayTz(TimeOfDayTz{time010203, true, -3600})},
+		{str: "01:02:03-01:23", expected: timeOfDayTz(TimeOfDayTz{time010203, true, -(3600 + 23*60)})},
+		{str: "01:02:03-0123", expected: timeOfDayTz(TimeOfDayTz{time010203, true, -(3600 + 23*60)})},
 		// dateTime
-		{str: "2013-10-08T00:00:00", value: DateTimeTest{time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)}, tag: "no:dateTime.tz"},
-		{str: "20131008", value: DateTimeTest{time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)}, noMarshal: true},
-		{str: "2013-10-08T10:30:50", value: DateTimeTest{time.Date(2013, 10, 8, 10, 30, 50, 0, localLoc)}, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50T", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true},
-		{str: "2013-10-08T10:30:50+01", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50+01:23", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50+0123", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50-01", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50-01:23", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-		{str: "2013-10-08T10:30:50-0123", value: DateTimeTest{}, wantUnmarshalErr: true, noMarshal: true, tag: "no:dateTime.tz"},
-
+		{str: "2013-10-08T00:00:00", expected: dateTime(DateTime(time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)))}, // d
+		{str: "20131008", expected: dateTime(DateTime(time.Date(2013, 10, 8, 0, 0, 0, 0, localLoc)))},
+		{str: "2013-10-08T10:30:50", expected: dateTime(DateTime(time.Date(2013, 10, 8, 10, 30, 50, 0, localLoc)))}, // d
+		{str: "2013-10-08T10:30:50T", expected: dateTime(DateTime{}), err: `value "10:30:50T" is not in ISO8601 time format`},
+		{str: "2013-10-08T10:30:50+01", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50+01"`},       // d
+		{str: "2013-10-08T10:30:50+01:23", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50+01:23"`}, // d
+		{str: "2013-10-08T10:30:50+0123", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50+0123"`},   // d
+		{str: "2013-10-08T10:30:50-01", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50-01"`},       // d
+		{str: "2013-10-08T10:30:50-01:23", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50-01:23"`}, // d
+		{str: "2013-10-08T10:30:50-0123", expected: dateTime(DateTime{}), err: `unexpected timezone in "2013-10-08T10:30:50-0123"`},   // d
 		// dateTime.tz
-		{str: "2013-10-08T10:30:50", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, localLoc)}, noMarshal: true},
-		{str: "2013-10-08T10:30:50+01", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:00", 3600))}, noMarshal: true},
-		{str: "2013-10-08T10:30:50+01:23", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:23", 3600+23*60))}},
-		{str: "2013-10-08T10:30:50+0123", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:23", 3600+23*60))}, noMarshal: true},
-		{str: "2013-10-08T10:30:50-01", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:00", -3600))}, noMarshal: true},
-		{str: "2013-10-08T10:30:50-01:23", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:23", -(3600+23*60)))}},
-		{str: "2013-10-08T10:30:50-0123", value: DateTimeTzTest{time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:23", -(3600+23*60)))}, noMarshal: true},
-
+		{str: "2013-10-08T10:30:50", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, localLoc)))},
+		{str: "2013-10-08T10:30:50+01", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:00", 3600))))},
+		{str: "2013-10-08T10:30:50+01:23", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:23", 3600+23*60))))},
+		{str: "2013-10-08T10:30:50+0123", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("+01:23", 3600+23*60))))},
+		{str: "2013-10-08T10:30:50-01", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:00", -3600))))},
+		{str: "2013-10-08T10:30:50-01:23", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:23", -(3600+23*60)))))},
+		{str: "2013-10-08T10:30:50-0123", expected: dateTimeTz(DateTimeTz(time.Date(2013, 10, 8, 10, 30, 50, 0, time.FixedZone("-01:23", -(3600+23*60)))))},
 		// boolean
-		{str: "0", value: BooleanTest(false)},
-		{str: "1", value: BooleanTest(true)},
-		{str: "false", value: BooleanTest(false), noMarshal: true},
-		{str: "true", value: BooleanTest(true), noMarshal: true},
-		{str: "no", value: BooleanTest(false), noMarshal: true},
-		{str: "yes", value: BooleanTest(true), noMarshal: true},
-		{str: "", value: BooleanTest(false), noMarshal: true, wantUnmarshalErr: true},
-		{str: "other", value: BooleanTest(false), noMarshal: true, wantUnmarshalErr: true},
-		{str: "2", value: BooleanTest(false), noMarshal: true, wantUnmarshalErr: true},
-		{str: "-1", value: BooleanTest(false), noMarshal: true, wantUnmarshalErr: true},
-
+		{str: "0", expected: bool_(false)},
+		{str: "1", expected: bool_(true)},
+		{str: "false", expected: bool_(false)},
+		{str: "true", expected: bool_(true)},
+		{str: "no", expected: bool_(false)},
+		{str: "yes", expected: bool_(true)},
+		{str: "", expected: bool_(false), err: `"" is not a valid boolean value`},
+		{str: "other", expected: bool_(false), err: `"other" is not a valid boolean value`},
+		{str: "2", expected: bool_(false), err: `"2" is not a valid boolean value`},
+		{str: "-1", expected: bool_(false), err: `"-1" is not a valid boolean value`},
 		// bin.base64
-		{str: "", value: BinBase64Test{}},
-		{str: "YQ==", value: BinBase64Test("a")},
-		{str: "TG9uZ2VyIFN0cmluZy4=", value: BinBase64Test("Longer String.")},
-		{str: "TG9uZ2VyIEFsaWduZWQu", value: BinBase64Test("Longer Aligned.")},
-
+		{str: "", expected: binBase64(nil)},
+		{str: "YQ==", expected: binBase64(BinBase64("a"))},
+		{str: "TG9uZ2VyIFN0cmluZy4=", expected: binBase64(BinBase64("Longer String."))},
+		{str: "TG9uZ2VyIEFsaWduZWQu", expected: binBase64(BinBase64("Longer Aligned."))},
 		// bin.hex
-		{str: "", value: BinHexTest{}},
-		{str: "61", value: BinHexTest("a")},
-		{str: "4c6f6e67657220537472696e672e", value: BinHexTest("Longer String.")},
-		{str: "4C6F6E67657220537472696E672E", value: BinHexTest("Longer String."), noMarshal: true},
-
+		{str: "", expected: binHex(nil)},
+		{str: "61", expected: binHex(BinHex("a"))},
+		{str: "4c6f6e67657220537472696e672e", expected: binHex(BinHex("Longer String."))},
+		{str: "4C6F6E67657220537472696E672E", expected: binHex(BinHex("Longer String."))},
 		// uri
-		{str: "http://example.com/path", value: URITest{&url.URL{Scheme: "http", Host: "example.com", Path: "/path"}}},
+		{str: "http://example.com/path", expected: uri(URI(url.URL{Scheme: "http", Host: "example.com", Path: "/path"}))},
 	}
 
-	// Generate extra test cases from convTests that implement duper.
-	var extras []testCase
-	for i := range tests {
-		if duper, ok := tests[i].value.(duper); ok {
-			dupes := duper.Dupe(tests[i].tag)
-			for _, duped := range dupes {
-				dupedCase := testCase(tests[i])
-				dupedCase.value = duped
-				extras = append(extras, dupedCase)
+	for _, testCase := range testCases {
+		var err error
+		var out []byte
+		switch {
+		case testCase.value == nil:
+			typ := reflect.TypeOf(testCase.expected).Elem()
+			value := reflect.New(typ).Interface().(convTest)
+			err = value.UnmarshalText([]byte(testCase.str))
+		case testCase.value != nil:
+			out, err = testCase.value.MarshalText()
+			if !bytes.Equal(out, []byte(testCase.str)) {
+				t.Errorf("expected %q but got %q", testCase.str, out)
+			}
+		}
+		if err == nil && testCase.err != "" {
+			t.Error("expected error:", testCase.err)
+		}
+		if err != nil {
+			if testCase.err != "" && !strings.HasSuffix(err.Error(), testCase.err) {
+				t.Errorf("expected error %v but got %v", err, testCase.err)
+			} else if testCase.err == "" {
+				t.Error("failed: ", err)
 			}
 		}
 	}
-	tests = append(tests, extras...)
-
-	for _, test := range tests {
-		if test.noMarshal {
-		} else if resultStr, err := test.value.Marshal(); err != nil && !test.wantMarshalErr {
-			t.Errorf("For %T marshal %v, want %q, got error: %v", test.value, test.value, test.str, err)
-		} else if err == nil && test.wantMarshalErr {
-			t.Errorf("For %T marshal %v, want error, got %q", test.value, test.value, resultStr)
-		} else if err == nil && resultStr != test.str {
-			t.Errorf("For %T marshal %v, want %q, got %q", test.value, test.value, test.str, resultStr)
-		}
-
-		if test.noUnMarshal {
-		} else if resultValue, err := test.value.Unmarshal(test.str); err != nil && !test.wantUnmarshalErr {
-			t.Errorf("For %T unmarshal %q, want %v, got error: %v", test.value, test.str, test.value, err)
-		} else if err == nil && test.wantUnmarshalErr {
-			t.Errorf("For %T unmarshal %q, want error, got %v", test.value, test.str, resultValue)
-		} else if err == nil && !test.value.Equal(resultValue) {
-			t.Errorf("For %T unmarshal %q, want %v, got %v", test.value, test.str, test.value, resultValue)
-		}
-	}
 }
+
+func ui1(v Ui1) convTest                 { return &v }
+func ui2(v Ui2) convTest                 { return &v }
+func ui4(v Ui4) convTest                 { return &v }
+func ui8(v Ui8) convTest                 { return &v }
+func i1(v I1) convTest                   { return &v }
+func i2(v I2) convTest                   { return &v }
+func i4(v I4) convTest                   { return &v }
+func int_(v Int) convTest                { return &v }
+func fixed14_4(v Fixed14_4) convTest     { return &v }
+func char(v Char) convTest               { return &v }
+func bool_(v Bool) convTest              { return &v }
+func date(v Date) convTest               { return &v }
+func dateTime(v DateTime) convTest       { return &v }
+func dateTimeTz(v DateTimeTz) convTest   { return &v }
+func timeOfDay(v TimeOfDay) convTest     { return &v }
+func timeOfDayTz(v TimeOfDayTz) convTest { return &v }
+func binBase64(v BinBase64) convTest     { return &v }
+func binHex(v BinHex) convTest           { return &v }
+func uri(v URI) convTest                 { return &v }

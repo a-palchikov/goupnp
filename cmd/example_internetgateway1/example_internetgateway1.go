@@ -46,21 +46,33 @@ func main() {
 		}
 
 		if scpd == nil || scpd.GetAction("GetStatusInfo") != nil {
-			status, lastErr, uptime, err := c.GetStatusInfo()
-			fmt.Println("GetStatusInfo: ", status, lastErr, uptime, err)
+			resp, err := c.GetStatusInfo()
+			fmt.Println("GetStatusInfo: ", resp.NewConnectionStatus, resp.NewLastConnectionError, resp.NewUptime, err)
 		}
 
 		if scpd == nil || scpd.GetAction("GetIdleDisconnectTime") != nil {
-			idleTime, err := c.GetIdleDisconnectTime()
-			fmt.Println("GetIdleDisconnectTime: ", idleTime, err)
+			resp, err := c.GetIdleDisconnectTime()
+			fmt.Println("GetIdleDisconnectTime: ", resp.NewIdleDisconnectTime, err)
 		}
 
 		if scpd == nil || scpd.GetAction("AddPortMapping") != nil {
-			err := c.AddPortMapping("", 5000, "TCP", 5001, "192.168.1.2", true, "Test port mapping", 0)
+			req := internetgateway1.WANPPPConnection1AddPortMappingRequest{
+				NewExternalPort:           5000,
+				NewProtocol:               "TCP",
+				NewInternalPort:           5001,
+				NewInternalClient:         "192.168.1.2",
+				NewEnabled:                true,
+				NewPortMappingDescription: "Test port mapping",
+			}
+			_, err := c.AddPortMapping(req)
 			fmt.Println("AddPortMapping: ", err)
 		}
 		if scpd == nil || scpd.GetAction("DeletePortMapping") != nil {
-			err := c.DeletePortMapping("", 5000, "TCP")
+			req := internetgateway1.WANPPPConnection1DeletePortMappingRequest{
+				NewExternalPort: 5000,
+				NewProtocol:     "TCP",
+			}
+			_, err := c.DeletePortMapping(req)
 			fmt.Println("DeletePortMapping: ", err)
 		}
 	}
